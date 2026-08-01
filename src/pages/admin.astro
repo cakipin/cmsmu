@@ -1,3 +1,13 @@
 ---
-return Astro.redirect('/keystatic');
+export const prerender = true;
 ---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="refresh" content="0;url=/keystatic" />
+    <title>Redirecting to Admin...</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href="/keystatic">Admin Panel</a>...</p>
+  </body>
+</html>

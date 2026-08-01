@@ -26,9 +26,6 @@ import keystatic from "@keystatic/astro";
 import cloudflare from "@astrojs/cloudflare";
 
 export default defineConfig({
-  redirects: {
-    "/admin": "/keystatic",
-  },
   site: config.site.url,
 
   integrations: [mdx(), sitemap({
