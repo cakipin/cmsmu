@@ -18,20 +18,17 @@ import {
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import config from "./astro-paper.config";
-
 import react from "@astrojs/react";
-
-import keystatic from "@keystatic/astro";
-
 import cloudflare from "@astrojs/cloudflare";
 
 export default defineConfig({
   site: config.site.url,
+  output: 'server',
 
   integrations: [mdx(), sitemap({
     filter: page =>
       config.features?.showArchives !== false || !page.endsWith("/archives/"),
-  }), react(), keystatic()],
+  }), react()],
 
   i18n: {
     locales: ["en"],

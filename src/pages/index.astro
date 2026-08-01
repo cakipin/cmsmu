@@ -1,138 +1,125 @@
 ---
-import { getCollection } from "astro:content";
 import { getRelativeLocaleUrl } from "astro:i18n";
-import IconRss from "@/assets/icons/IconRss.svg";
-import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import { getD1Posts } from "@/utils/getD1Posts";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Socials from "@/components/Socials.astro";
 import Card from "@/components/Card.astro";
-import LinkButton from "@/components/LinkButton.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
-import { useTranslations } from "@/i18n";
 import config from "@/config";
 
-const { socials, posts: postsConfig } = config;
-
 const locale = Astro.currentLocale ?? config.site.lang;
-const t = useTranslations(locale);
-
-const posts = await getCollection("posts");
+const posts = await getD1Posts(Astro);
 const sortedPosts = getSortedPosts(posts);
-const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
-const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
-const homePath = getRelativeLocaleUrl(locale, "");
+const recentPosts = sortedPosts.slice(0, 3); // Just top 3 for landing page
 ---
 
 <Layout>
   <Header />
-  <main
-    id="main-content"
-    data-layout="index"
-    data-home-path={homePath}
-    class="app-layout"
-  >
-    <section id="hero" class="border-border border-b pt-8 pb-6">
-      <h1 class="my-4 inline-block text-4xl font-bold sm:my-8 sm:text-5xl">
-        Mingalaba
-      </h1>
-      <a
-        target="_blank"
-        href={`${import.meta.env.BASE_URL.replace(/\/?$/, "/")}rss.xml`}
-        class="inline-block"
-        aria-label="RSS Feed"
-        title="RSS Feed"
-      >
-        <IconRss
-          width={20}
-          height={20}
-          class="stroke-accent scale-125 stroke-3 rtl:-rotate-90"
-        />
-        <span class="sr-only">RSS Feed</span>
-      </a>
+  
+  <main id="main-content" class="w-full">
+    <!-- Hero Section -->
+    <section class="relative w-full overflow-hidden bg-gradient-to-br from-skin-fill to-skin-fill pt-24 pb-32 text-center flex flex-col items-center justify-center">
+      
+      <!-- Decorative background glow -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-accent opacity-20 blur-[100px] rounded-full pointer-events-none"></div>
 
-      <p>
-        AstroPaper is a minimal, responsive, accessible and SEO-friendly Astro
-        blog theme. This theme follows best practices and provides accessibility
-        out of the box. Light and dark mode are supported by default. Moreover,
-        additional color schemes can also be configured.
-      </p>
-      <p class="mt-2">
-        Read the blog posts or check{" "}
-        <LinkButton
-          class="hover:text-accent underline decoration-dashed underline-offset-4"
-          href="https://github.com/satnaing/astro-paper#readme"
-        >
-          README
-        </LinkButton>{" "}
-        for more info.
-      </p>
-      {
-        socials.length > 0 && (
-          <div class="mt-4 flex max-sm:flex-col sm:items-center">
-            <div class="me-2 mb-1 whitespace-nowrap sm:mb-0">
-              {t.home.socialLinks}:
-            </div>
-            <Socials />
-          </div>
-        )
-      }
+      <div class="relative z-10 max-w-4xl px-4">
+        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-accent to-purple-500">
+          Supercharge Your Content with CMSMu
+        </h1>
+        <p class="text-lg md:text-xl text-skin-base opacity-80 max-w-2xl mx-auto mb-10 leading-relaxed">
+          The ultimate Cloudflare-native CMS built for speed, simplicity, and scale. No servers, no databases to maintain. Just lightning-fast content delivery.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a href="/admin" class="px-8 py-4 bg-accent text-skin-inverted font-semibold rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+            Go to Dashboard
+          </a>
+          <a href="https://github.com/cakiphin/cmsMu" target="_blank" class="px-8 py-4 bg-skin-card text-skin-base font-semibold rounded-lg shadow border border-skin-line hover:border-accent hover:bg-skin-fill transition-all duration-300">
+            View Documentation
+          </a>
+        </div>
+      </div>
     </section>
 
-    {
-      featuredPosts.length > 0 && (
-        <section
-          id="featured"
-          class:list={[
-            "pt-12 pb-6",
-            { "border-border border-b": recentPosts.length > 0 },
-          ]}
-        >
-          <h2 class="text-2xl font-semibold tracking-wide">
-            {t.home.featured}
-          </h2>
-          <ul>
-            {featuredPosts.map(data => (
-              <Card variant="h3" {...data} />
-            ))}
-          </ul>
-        </section>
-      )
-    }
+    <!-- Features Section -->
+    <section class="py-24 px-4 bg-skin-card border-t border-b border-skin-line">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-bold mb-4">Why Choose CMSMu?</h2>
+          <p class="text-skin-base opacity-75">Built specifically for the modern edge computing era.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          <!-- Feature 1 -->
+          <div class="p-8 rounded-2xl bg-skin-fill border border-skin-line shadow-sm hover:shadow-md hover:border-accent transition-all duration-300 group">
+            <div class="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Edge Performance</h3>
+            <p class="text-skin-base opacity-75 leading-relaxed">Deployed directly to Cloudflare Pages. Content is served from 300+ data centers worldwide with zero latency.</p>
+          </div>
 
-    {
-      recentPosts.length > 0 && (
-        <section id="recent-posts" class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide">
-            {t.home.recentPosts}
-          </h2>
-          <ul>
-            {recentPosts.slice(0, postsConfig.perIndex).map(data => (
-              <Card variant="h3" {...data} />
-            ))}
-          </ul>
-        </section>
-      )
-    }
+          <!-- Feature 2 -->
+          <div class="p-8 rounded-2xl bg-skin-fill border border-skin-line shadow-sm hover:shadow-md hover:border-accent transition-all duration-300 group">
+            <div class="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">D1 & R2 Native</h3>
+            <p class="text-skin-base opacity-75 leading-relaxed">Stores your data seamlessly in Cloudflare D1 SQL database and images in R2 buckets. No external services needed.</p>
+          </div>
 
-    <div class="my-8 text-center">
-      <LinkButton href={getRelativeLocaleUrl(locale, "posts")}>
-        {t.home.allPosts}
-        <IconArrowRight class="inline-block rtl:-rotate-180" />
-      </LinkButton>
-    </div>
+          <!-- Feature 3 -->
+          <div class="p-8 rounded-2xl bg-skin-fill border border-skin-line shadow-sm hover:shadow-md hover:border-accent transition-all duration-300 group">
+            <div class="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Fully Customizable</h3>
+            <p class="text-skin-base opacity-75 leading-relaxed">Built with Astro and AlpineJS. Easily change themes, add plugins, and modify the UI exactly how you want it.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Content Section -->
+    <section class="py-24 px-4 max-w-4xl mx-auto">
+      <div class="flex justify-between items-end mb-10 border-b border-skin-line pb-4">
+        <div>
+          <h2 class="text-3xl font-bold">Latest Posts</h2>
+          <p class="text-skin-base opacity-75 mt-2">See what's new on the platform</p>
+        </div>
+        <a href={getRelativeLocaleUrl(locale, "posts")} class="group flex items-center gap-2 text-accent hover:underline font-medium">
+          View all
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="space-y-8">
+        {recentPosts.length > 0 ? (
+          recentPosts.map(data => (
+            <div class="p-6 rounded-xl border border-skin-line hover:border-accent hover:shadow-md transition-all duration-300 bg-skin-card">
+               <Card variant="h3" {...data} />
+            </div>
+          ))
+        ) : (
+          <div class="text-center py-12 bg-skin-card rounded-xl border border-skin-line border-dashed">
+             <p class="opacity-60 italic">No posts found yet. Create some from the dashboard!</p>
+          </div>
+        )}
+      </div>
+    </section>
+
   </main>
+  
   <Footer />
 </Layout>
-
-<script>
-  document.addEventListener("astro:page-load", () => {
-    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
-      ?.dataset;
-    const baseRoot = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-    if (indexLayout?.layout) {
-      sessionStorage.setItem("backUrl", indexLayout.homePath ?? baseRoot);
-    }
-  });
-</script>
