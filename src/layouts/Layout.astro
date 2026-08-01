@@ -23,6 +23,28 @@ const {
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
 } = Astro.props;
 
+import { env } from "cloudflare:workers";
+
+let cmsThemeBg = "";
+let cmsThemeText = "";
+let cmsThemePrimary = "";
+
+try {
+  const db = env?.DB;
+  if (db) {
+    const { results } = await db.prepare("SELECT key, value FROM settings WHERE key LIKE 'theme_%'").all();
+    if (results) {
+      results.forEach((row: any) => {
+        if (row.key === 'theme_bg') cmsThemeBg = row.value;
+        if (row.key === 'theme_text') cmsThemeText = row.value;
+        if (row.key === 'theme_primary') cmsThemePrimary = row.value;
+      });
+    }
+  }
+} catch (e) {
+  console.error("Failed to fetch CMS theme colors:", e);
+}
+
 const socialImageURL = new URL(ogImage, Astro.site ?? Astro.url);
 const rssHref = getRelativeLocaleUrl(
   Astro.currentLocale ?? config.site.lang,
@@ -85,6 +107,16 @@ const rssHref = getRelativeLocaleUrl(
 
     <!-- Extra head content injected by child layouts (e.g. JSON-LD, article meta) -->
     <slot name="head" />
+
+    {(cmsThemeBg || cmsThemeText || cmsThemePrimary) && (
+      <style set:html={`
+        :root, [data-theme="light"], [data-theme="dark"] {
+          ${cmsThemeBg ? `--background: ${cmsThemeBg};` : ''}
+          ${cmsThemeText ? `--foreground: ${cmsThemeText};` : ''}
+          ${cmsThemePrimary ? `--accent: ${cmsThemePrimary};` : ''}
+        }
+      `} />
+    )}
 
     {
       site.googleVerification && (
