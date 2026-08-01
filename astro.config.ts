@@ -19,15 +19,23 @@ import {
 import { transformerFileName } from "./src/utils/transformers/fileName";
 import config from "./astro-paper.config";
 
+import react from "@astrojs/react";
+
+import keystatic from "@keystatic/astro";
+
+import cloudflare from "@astrojs/cloudflare";
+
 export default defineConfig({
+  redirects: {
+    "/admin": "/keystatic",
+  },
   site: config.site.url,
-  integrations: [
-    mdx(),
-    sitemap({
-      filter: page =>
-        config.features?.showArchives !== false || !page.endsWith("/archives/"),
-    }),
-  ],
+
+  integrations: [mdx(), sitemap({
+    filter: page =>
+      config.features?.showArchives !== false || !page.endsWith("/archives/"),
+  }), react(), keystatic()],
+
   i18n: {
     locales: ["en"],
     defaultLocale: "en",
@@ -35,6 +43,7 @@ export default defineConfig({
       prefixDefaultLocale: false,
     },
   },
+
   markdown: {
     processor: unified({
       remarkPlugins: [
@@ -55,9 +64,11 @@ export default defineConfig({
       ],
     },
   },
+
   vite: {
     plugins: [tailwindcss()],
   },
+
   fonts: [
     {
       name: "Google Sans Code",
@@ -69,6 +80,7 @@ export default defineConfig({
       formats: ["woff", "ttf"],
     },
   ],
+
   env: {
     schema: {
       PUBLIC_GOOGLE_SITE_VERIFICATION: envField.string({
@@ -78,7 +90,10 @@ export default defineConfig({
       }),
     },
   },
+
   experimental: {
     svgOptimizer: svgoOptimizer(),
   },
+
+  adapter: cloudflare(),
 });

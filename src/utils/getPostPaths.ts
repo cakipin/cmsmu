@@ -1,5 +1,5 @@
 import { getRelativeLocaleUrl } from "astro:i18n";
-import { BLOG_PATH } from "@/content.config";
+const BLOG_PATH = "src/content/posts";
 import { slugifyStr } from "./slugify";
 import config from "@/config";
 
