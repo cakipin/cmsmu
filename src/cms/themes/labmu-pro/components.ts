@@ -2,9 +2,10 @@ import type { ThemeContext } from '../../themes/types';
 
 // --- 1. HEADER (DENGAN BURGER MENU & DROPDOWN) ---
 export const renderHeader = (ctx: ThemeContext) => {
+  const siteTitle = ctx.site?.site_title || ctx.site?.title || 'CMSMu';
   const logoContent = ctx.site?.site_logo 
-    ? `<img src="${ctx.site.site_logo}" alt="${ctx.site.title} Logo" style="max-height: 40px;">` 
-    : `<i class="fas fa-layer-group"></i> <span>${ctx.site.title}</span>`;
+    ? `<img src="${ctx.site.site_logo}" alt="${siteTitle} Logo" style="max-height: 40px;">` 
+    : `<i class="fas fa-layer-group"></i> <span>${siteTitle}</span>`;
   
   const textStyle = `color: ${ctx.site?.header_text_color || 'var(--header-text)'} !important;`;
   
@@ -15,6 +16,15 @@ export const renderHeader = (ctx: ThemeContext) => {
     menuWrapperStyle = 'margin-right: auto; margin-left: 2rem;';
   }
 
+  const menus = ctx.menus || [];
+  const desktopMenuHtml = menus.length > 0 
+    ? menus.map((m: any) => `<a href="${m.url}" class="nav-link" style="${textStyle}">${m.title}</a>`).join('\n        ')
+    : `<a href="/" class="nav-link" style="${textStyle}">Home</a>`;
+
+  const mobileMenuHtml = menus.length > 0
+    ? menus.map((m: any) => `<a href="${m.url}" class="nav-link">${m.title}</a>`).join('\n    ')
+    : `<a href="/" class="nav-link">Home</a>`;
+
   return `
   <header class="pro-header">
     <div class="container header-inner">
@@ -24,19 +34,8 @@ export const renderHeader = (ctx: ThemeContext) => {
       
       <!-- Desktop Menu -->
       <nav class="nav-menu" style="${menuWrapperStyle}">
-        <a href="/" class="nav-link" style="${textStyle}">Home</a>
-        <div class="dropdown">
-          <a href="#" class="nav-link" style="${textStyle}">Features <i class="fas fa-chevron-down" style="font-size:0.8em; margin-left:4px;"></i></a>
-          <div class="dropdown-content">
-            <a href="#">Layout Options</a>
-            <a href="#">UI Components</a>
-            <a href="#">Typography</a>
-          </div>
-        </div>
-        <a href="#" class="nav-link" style="${textStyle}">Blog</a>
-        <a href="#" class="nav-link" style="${textStyle}">About</a>
-        <a href="#" class="btn btn-primary" style="padding: 0.5rem 1.25rem; color: white !important;">Contact</a>
-        <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle Dark Mode" style="${textStyle}; background:none; border:none; font-size:1.2rem; cursor:pointer;">
+        ${desktopMenuHtml}
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle Dark Mode" style="${textStyle}; background:none; border:none; font-size:1.2rem; cursor:pointer; margin-left:1rem;">
            <i class="fas fa-moon icon-moon"></i>
            <i class="fas fa-sun icon-sun" style="display:none;"></i>
         </button>
@@ -51,14 +50,10 @@ export const renderHeader = (ctx: ThemeContext) => {
 
   <!-- Mobile Off-Canvas Menu -->
   <div class="mobile-menu" id="mobileMenu">
-    <a href="/" class="nav-link">Home</a>
-    <a href="#" class="nav-link">Features</a>
-    <a href="#" class="nav-link">Blog</a>
-    <a href="#" class="nav-link">About</a>
-    <a href="#" class="btn btn-primary" style="text-align:center;">Contact</a>
-    <button class="btn btn-outline theme-toggle" id="mobileThemeToggleBtn" style="justify-content:center;">
+    ${mobileMenuHtml}
+    <button class="btn btn-outline theme-toggle" id="mobileThemeToggleBtn" style="justify-content:center; margin-top:1rem;">
        <i class="fas fa-moon icon-moon"></i>
-       <i class="fas fa-sun icon-sun"></i> 
+       <i class="fas fa-sun icon-sun" style="display:none;"></i> 
        <span style="margin-left:8px;">Toggle Theme</span>
     </button>
   </div>
