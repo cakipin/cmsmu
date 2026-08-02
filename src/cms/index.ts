@@ -107,9 +107,9 @@ app.get('/media/*', async (c) => {
 });
 
 // =====================================================================
-// PUBLIC ROUTER (THEME) - DISABLED FOR ASTRO INTEGRATION
+// PUBLIC ROUTER (THEME) - INTEGRATED
 // =====================================================================
 // Menangani Homepage, Login, Search, dan URL lain yang tidak ada di DB
-// app.route('/', publicRouter);
+app.route('/', publicRouter);
 
 export default app
