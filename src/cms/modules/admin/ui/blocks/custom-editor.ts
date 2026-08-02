@@ -2,7 +2,7 @@ export const customEditorTemplate = `
 <div x-data="customEditorLogic()" 
      x-init="initEditor(form.body)" 
      class="custom-editor-container" 
-     style="display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border: 1px solid #c3c4c7; border-radius: 4px; background: #fff;">
+     style="display: flex; flex-direction: column; position: relative; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border: 1px solid #c3c4c7; border-radius: 4px; background: #fff;">
     
     <!-- WP Classic Style Toolbar -->
     <div class="editor-toolbar" style="display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; background: #f0f0f1; border-bottom: 1px solid #c3c4c7; border-radius: 4px 4px 0 0;">
@@ -72,6 +72,19 @@ export const customEditorTemplate = `
          @keydown.enter="handleEnter">
     </div>
 
+    <!-- Image Context Menu -->
+    <div x-show="imageMenuOpen" 
+         x-cloak
+         style="position: absolute; z-index: 50; background: #fff; border: 1px solid #c3c4c7; border-radius: 4px; padding: 4px; display: flex; gap: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"
+         :style="'top: ' + imageMenuPos.top + '; left: ' + imageMenuPos.left">
+         <button @click.prevent="alignImage('left')" type="button" class="editor-btn" title="Float Left"><i class="fas fa-align-left"></i></button>
+         <button @click.prevent="alignImage('center')" type="button" class="editor-btn" title="Center"><i class="fas fa-align-center"></i></button>
+         <button @click.prevent="alignImage('right')" type="button" class="editor-btn" title="Float Right"><i class="fas fa-align-right"></i></button>
+         <div class="toolbar-divider" style="width: 1px; background: #c3c4c7; margin: 0 4px;"></div>
+         <button @click.prevent="alignImage('none')" type="button" class="editor-btn" title="Reset"><i class="fas fa-times"></i></button>
+         <button @click.prevent="removeImage()" type="button" class="editor-btn" style="color:#dc2626;" title="Hapus"><i class="fas fa-trash"></i></button>
+    </div>
+
     <style>
         .editor-btn {
             padding: 6px 10px; color: #3c434a; background: transparent; border: 1px solid transparent; border-radius: 3px; cursor: pointer;
@@ -111,6 +124,10 @@ function customEditorLogic() {
         linkModalOpen: false,
         linkUrl: '',
         
+        selectedImage: null,
+        imageMenuOpen: false,
+        imageMenuPos: { top: 0, left: 0 },
+        
         initEditor(initialContent) {
             this.$watch('form.body', (val) => {
                 if(this.$refs.editor.innerHTML !== val && document.activeElement !== this.$refs.editor) {
@@ -122,6 +139,23 @@ function customEditorLogic() {
                     this.$refs.editor.innerHTML = initialContent || '<p><br></p>';
                 }
             }, 100);
+            
+            // Image click listener for context menu
+            this.$refs.editor.addEventListener('click', (e) => {
+                if (e.target.tagName === 'IMG') {
+                    this.selectedImage = e.target;
+                    const rect = e.target.getBoundingClientRect();
+                    const containerRect = this.$refs.editor.getBoundingClientRect();
+                    this.imageMenuPos = {
+                        top: (rect.top - containerRect.top + this.$refs.editor.scrollTop + 10) + 'px',
+                        left: (rect.left - containerRect.left + 10) + 'px'
+                    };
+                    this.imageMenuOpen = true;
+                } else {
+                    this.imageMenuOpen = false;
+                    this.selectedImage = null;
+                }
+            });
             
             // Listen for image insertion from Media Manager (kita perlu trigger dari luar)
             window.addEventListener('insert-media', (e) => {
@@ -142,6 +176,10 @@ function customEditorLogic() {
         checkSelection() {
             this.updateActiveFormats();
             this.saveSelection();
+            if (this.imageMenuOpen && window.getSelection().toString().length > 0) {
+                this.imageMenuOpen = false;
+                this.selectedImage = null;
+            }
         },
         
         updateActiveFormats() {
@@ -205,6 +243,33 @@ function customEditorLogic() {
 
         handleEnter(e) {
             // Default behavior for contenteditable usually handles paragraph breaks nicely in modern browsers
+            this.updateContent();
+        },
+        
+        alignImage(pos) {
+            if (!this.selectedImage) return;
+            this.selectedImage.style.float = '';
+            this.selectedImage.style.display = '';
+            this.selectedImage.style.margin = '';
+            
+            if (pos === 'left') {
+                this.selectedImage.style.float = 'left';
+                this.selectedImage.style.margin = '0 1em 1em 0';
+            } else if (pos === 'right') {
+                this.selectedImage.style.float = 'right';
+                this.selectedImage.style.margin = '0 0 1em 1em';
+            } else if (pos === 'center') {
+                this.selectedImage.style.display = 'block';
+                this.selectedImage.style.margin = '1em auto';
+            }
+            this.updateContent();
+        },
+        
+        removeImage() {
+            if (!this.selectedImage) return;
+            this.selectedImage.remove();
+            this.imageMenuOpen = false;
+            this.selectedImage = null;
             this.updateContent();
         },
         
