@@ -8,7 +8,9 @@ export const themesPage = `
             theme_primary_dark: '#135e96',
             theme_bg: '#ffffff',
             theme_text: '#1a1a2e',
-            theme_accent: '#f0f7ff'
+            theme_accent: '#f0f7ff',
+            header_logo_url: '',
+            header_menu_position: 'right'
         },
 
         async openThemeEditor() {
@@ -24,6 +26,8 @@ export const themesPage = `
                     if (d.theme_bg)           this.themeColors.theme_bg           = d.theme_bg;
                     if (d.theme_text)         this.themeColors.theme_text         = d.theme_text;
                     if (d.theme_accent)       this.themeColors.theme_accent       = d.theme_accent;
+                    if (d.header_logo_url)    this.themeColors.header_logo_url    = d.header_logo_url;
+                    if (d.header_menu_position) this.themeColors.header_menu_position = d.header_menu_position;
                 }
             } catch(e) {}
             this.themeEditorOpen = true;
@@ -39,7 +43,7 @@ export const themesPage = `
                     body: JSON.stringify(this.themeColors)
                 });
                 if (res.ok) {
-                    alert('✅ Warna tema berhasil disimpan!');
+                    alert('✅ Pengaturan tema berhasil disimpan!');
                     this.themeEditorOpen = false;
                 } else {
                     alert('❌ Gagal menyimpan.');
@@ -54,7 +58,9 @@ export const themesPage = `
                 theme_primary_dark: '#135e96',
                 theme_bg: '#ffffff',
                 theme_text: '#1a1a2e',
-                theme_accent: '#f0f7ff'
+                theme_accent: '#f0f7ff',
+                header_logo_url: '',
+                header_menu_position: 'right'
             };
         }
      }">
@@ -115,9 +121,29 @@ export const themesPage = `
         <!-- Modal Body -->
         <div style="flex:1; overflow-y:auto; padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
           
-          <!-- Left: Color Pickers -->
-          <div style="display:grid; gap:14px; align-content:start;">
-            <h4 style="margin:0 0 4px; font-size:14px; color:#374151; border-bottom:1px solid #e5e7eb; padding-bottom:8px;">Warna Tema</h4>
+          <!-- Left: Config Fields -->
+          <div style="display:grid; gap:14px; align-content:start; max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+            <h4 style="margin:0 0 4px; font-size:14px; color:#374151; border-bottom:1px solid #e5e7eb; padding-bottom:8px;">Header & Navigasi</h4>
+            
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:#4b5563; margin-bottom:6px;">URL Logo Header (Opsional)</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input type="text" x-model="themeColors.header_logo_url" placeholder="https://example.com/logo.png" style="flex:1; padding:7px; border:1px solid #d1d5db; border-radius:5px; font-size:12px; font-family:monospace;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:#4b5563; margin-bottom:6px;">Posisi Menu Navigasi</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <select x-model="themeColors.header_menu_position" style="flex:1; padding:7px; border:1px solid #d1d5db; border-radius:5px; font-size:12px;">
+                  <option value="right">Kanan (Default)</option>
+                  <option value="center">Tengah</option>
+                  <option value="left">Kiri</option>
+                </select>
+              </div>
+            </div>
+
+            <h4 style="margin:10px 0 4px; font-size:14px; color:#374151; border-bottom:1px solid #e5e7eb; padding-bottom:8px;">Warna Tema</h4>
 
             <div>
               <label style="display:block; font-size:12px; font-weight:600; color:#4b5563; margin-bottom:6px;">Warna Utama (Primary)</label>
@@ -137,7 +163,7 @@ export const themesPage = `
             </div>
 
             <div>
-              <label style="display:block; font-size:12px; font-weight:600; color:#4b5563; margin-bottom:6px;">Warna Background</label>
+              <label style="display:block; font-size:12px; font-weight:600; color:#4b5563; margin-bottom:6px;">Warna Background Tema</label>
               <div style="display:flex; gap:8px; align-items:center;">
                 <input type="color" x-model="themeColors.theme_bg" style="width:40px; height:34px; padding:2px; border:1px solid #d1d5db; border-radius:5px; cursor:pointer; flex-shrink:0;">
                 <input type="text" x-model="themeColors.theme_bg" style="flex:1; padding:7px; border:1px solid #d1d5db; border-radius:5px; font-size:12px; font-family:monospace;">
@@ -145,7 +171,7 @@ export const themesPage = `
             </div>
 
             <div>
-              <label style="display:block; font-size:12px; font-weight:600; color:#4b5563; margin-bottom:6px;">Warna Teks</label>
+              <label style="display:block; font-size:12px; font-weight:600; color:#4b5563; margin-bottom:6px;">Warna Teks Global</label>
               <div style="display:flex; gap:8px; align-items:center;">
                 <input type="color" x-model="themeColors.theme_text" style="width:40px; height:34px; padding:2px; border:1px solid #d1d5db; border-radius:5px; cursor:pointer; flex-shrink:0;">
                 <input type="text" x-model="themeColors.theme_text" style="flex:1; padding:7px; border:1px solid #d1d5db; border-radius:5px; font-size:12px; font-family:monospace;">
@@ -162,7 +188,7 @@ export const themesPage = `
             </div>
 
             <button @click="resetThemeColors()" style="margin-top:4px; padding:8px; background:#f3f4f6; border:1px solid #d1d5db; border-radius:6px; font-size:12px; cursor:pointer; color:#374151; text-align:center;">
-                ↺ Reset ke Warna Default
+                ↺ Reset ke Setelan Awal
             </button>
           </div>
           
@@ -173,7 +199,12 @@ export const themesPage = `
               
               <!-- Mini Header -->
               <div :style="'background:'+themeColors.theme_bg+'; border-bottom:1px solid #e5e7eb; padding:10px 14px; display:flex; align-items:center; justify-content:space-between;'">
-                <span :style="'font-weight:800; font-size:14px; color:'+themeColors.theme_primary">Nama Website</span>
+                <template x-if="themeColors.header_logo_url">
+                  <img :src="themeColors.header_logo_url" style="max-height: 20px;" alt="Logo">
+                </template>
+                <template x-if="!themeColors.header_logo_url">
+                  <span :style="'font-weight:800; font-size:14px; color:'+themeColors.theme_primary">Nama Website</span>
+                </template>
                 <div style="display:flex; gap:6px;">
                   <span :style="'font-size:11px; padding:3px 8px; border-radius:4px; color:'+themeColors.theme_primary+'; background:'+themeColors.theme_accent">Menu 1</span>
                   <span :style="'font-size:11px; padding:3px 8px; border-radius:4px; color:'+themeColors.theme_primary+'; background:'+themeColors.theme_accent">Menu 2</span>

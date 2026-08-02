@@ -4,6 +4,7 @@ import LabmuNews from './labmu-news';
 import LabmuPro from './labmu-pro';
 import LabmuQuran from './labmu-quran';
 import Wikimu from './wikimu';
+import Hestia from './hestia';
 
 
 // 1. Daftar Tema untuk API
@@ -36,6 +37,13 @@ export const availableThemes = [
     "version": "1.0.0",
     "author": "LabMu Dev",
     "description": "Tema ensiklopedia dengan gaya Skin Vector klasik ala Wikipedia."
+  },
+  {
+    "id": "hestia",
+    "name": "Hestia Clone",
+    "version": "1.0.0",
+    "author": "LabMu Dev",
+    "description": "Material Design inspired CMS theme clone."
   }
 ];
 
@@ -47,6 +55,7 @@ export const getActiveTheme = (id: string) => {
   'labmu-pro': LabmuPro,
   'labmu-quran': LabmuQuran,
   'wikimu': Wikimu,
+  'hestia': Hestia,
   };
   return themes[id] || themes['labmu-default'];
 };

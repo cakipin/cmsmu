@@ -7,23 +7,32 @@ const LabMuNews: ThemeStructure = {
   author: 'LabMu Dev',
 
   _layout(content: string, title: string, ctx: ThemeContext) {
+    const menus = ctx.menus || [];
+    const siteTitle = ctx.site.site_title || 'Portal Berita';
+
+    const navHtml = menus.length > 0 ? menus.map((m: any) => `
+      <a href="${m.url}">${m.label}</a>
+    `).join('') : `
+      <a href="/">Nasional</a>
+      <a href="/">Ekonomi</a>
+      <a href="/">Teknologi</a>
+      <a href="/quran" style="color:#059669;">QuranMu</a>
+    `;
+
     return `
       <!DOCTYPE html>
       <html lang="id">
       <head>
         <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${title} - ${ctx.site.title || 'Portal Berita'}</title>
+        <title>${title} - ${siteTitle}</title>
         <style>${css}</style>
       </head>
       <body>
         <header class="main-header">
           <div class="container header-inner">
-             <a href="/" class="logo">LabMu<span style="color:#111">News.</span></a>
+             <a href="/" class="logo">${siteTitle.split(' ')[0] || 'LabMu'}<span style="color:#111">${siteTitle.split(' ').slice(1).join(' ') || 'News.'}</span></a>
              <nav class="nav-menu">
-                <a href="/">Nasional</a>
-                <a href="/">Ekonomi</a>
-                <a href="/">Teknologi</a>
-                <a href="/quran" style="color:#059669;">QuranMu</a>
+                ${navHtml}
              </nav>
           </div>
         </header>
@@ -33,7 +42,7 @@ const LabMuNews: ThemeStructure = {
         </div>
 
         <footer>
-           <p>&copy; ${new Date().getFullYear()} LabMu News Premium. Ditenagai oleh LabMu CMS.</p>
+           <p>&copy; ${new Date().getFullYear()} ${siteTitle}. Ditenagai oleh LabMu CMS.</p>
         </footer>
       </body>
       </html>

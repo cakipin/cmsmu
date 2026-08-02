@@ -4,6 +4,7 @@ export interface ThemeContext {
     description: string;
     url: string;
   };
+  themeConfig?: any;    // Konfigurasi custom tema (contoh: header, footer, warna)
   data?: any;           // Data Utama (Bisa Single Post atau List Post)
   sidebarPosts?: any[]; // <--- TAMBAHAN: Data Khusus Sidebar
 }

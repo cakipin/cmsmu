@@ -35,15 +35,33 @@ export const renderPublicPage = async (db: D1Database, content: any = null, post
   const activeThemeId = opts.active_theme || 'labmu-default';
   const CurrentTheme = getActiveTheme(activeThemeId);
 
+  const themeConfig = {
+    header: {
+      logoUrl: opts.header_logo_url || '',
+      menuPosition: opts.header_menu_position || 'right',
+      backgroundColor: opts.theme_bg || '',
+      textColor: opts.theme_text || ''
+    },
+    colors: {
+      primary: opts.theme_primary,
+      primaryDark: opts.theme_primary_dark,
+      background: opts.theme_bg,
+      text: opts.theme_text,
+      accent: opts.theme_accent
+    }
+  };
+
   if (!content) {
     return CurrentTheme.renderHome({
       site: siteInfo,
+      themeConfig: themeConfig,
       data: posts,
       sidebarPosts: posts 
     });
   } else {
     return CurrentTheme.renderSingle({
       site: siteInfo,
+      themeConfig: themeConfig,
       data: content,
       sidebarPosts: posts
     });
