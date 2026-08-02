@@ -10,6 +10,7 @@ interface ThemeEditorAppProps {
 export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
   const [initialData, setInitialData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [pages, setPages] = useState<{id: number, title: string, slug: string}[]>([]);
 
   // Default empty data
   const defaultData = {
@@ -19,10 +20,26 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
   };
 
   useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('cmsMu_token') || '' : '';
+    
+    // Fetch page list
+    const fetchPages = async () => {
+      try {
+        const res = await fetch('/api/theme-editor/pages', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const result = await res.json();
+          if (result.data) setPages(result.data);
+        }
+      } catch (e) {
+        console.error("Gagal mengambil daftar halaman", e);
+      }
+    };
+
     // Fetch data from database
     const fetchData = async () => {
       try {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('cmsMu_token') || '' : '';
         const response = await fetch(`/api/theme-editor/page?slug=${encodeURIComponent(slug)}`, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -52,6 +69,8 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
         setIsLoading(false);
       }
     };
+
+    fetchPages();
     fetchData();
   }, [slug]);
 
@@ -83,6 +102,23 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
     }
   };
 
+  const handleCreateNewPage = () => {
+    const newSlug = window.prompt("Masukkan slug untuk halaman baru (contoh: contact-us):");
+    if (newSlug && newSlug.trim() !== "") {
+      const formattedSlug = newSlug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      if (formattedSlug) {
+        window.location.href = `?slug=${formattedSlug}`;
+      }
+    }
+  };
+
+  const handlePageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedSlug = e.target.value;
+    if (selectedSlug) {
+      window.location.href = `?slug=${selectedSlug}`;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -91,13 +127,75 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
     );
   }
 
+  // Cek apakah slug saat ini ada di daftar pages, jika tidak tambahkan sementara
+  const currentInPages = pages.find(p => p.slug === slug);
+  const displayPages = currentInPages ? pages : [...pages, { id: 0, title: slug + ' (Baru)', slug: slug }];
+
   return (
-    <div style={{ height: "100vh" }}>
-      <Puck
-        config={puckConfig}
-        data={initialData}
-        onPublish={handlePublish}
-      />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      {/* Custom Top Bar */}
+      <div style={{
+        height: '50px',
+        background: '#1f2937',
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 20px',
+        justifyContent: 'space-between',
+        borderBottom: '1px solid #374151'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <a href="/admin" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14px' }}>&larr; Kembali ke Admin</a>
+          <span style={{ fontWeight: 'bold', fontSize: '16px' }}>Theme Editor</span>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label htmlFor="pageSelect" style={{ fontSize: '14px', color: '#d1d5db' }}>Edit Halaman:</label>
+          <select 
+            id="pageSelect"
+            value={slug}
+            onChange={handlePageChange}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '4px',
+              background: '#374151',
+              color: 'white',
+              border: '1px solid #4b5563',
+              fontSize: '14px',
+              cursor: 'pointer'
+            }}
+          >
+            {displayPages.map(p => (
+              <option key={p.slug} value={p.slug}>{p.title} (/{p.slug})</option>
+            ))}
+          </select>
+          
+          <button 
+            onClick={handleCreateNewPage}
+            style={{
+              background: '#2563eb',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            + Buat Baru
+          </button>
+        </div>
+      </div>
+
+      {/* Puck Editor Container */}
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        <Puck
+          config={puckConfig}
+          data={initialData}
+          onPublish={handlePublish}
+        />
+      </div>
     </div>
   );
 }

@@ -23,6 +23,16 @@ themeEditorRouter.get('/page', async (c) => {
   }
 });
 
+// GET /api/theme-editor/pages
+themeEditorRouter.get('/pages', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare('SELECT id, title, slug FROM pages ORDER BY title ASC').all();
+    return c.json({ success: true, data: results || [] });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
 // POST /api/theme-editor/page
 themeEditorRouter.post('/page', async (c) => {
   try {

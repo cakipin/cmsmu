@@ -667,12 +667,14 @@ const LabMuPro: ThemeStructure = {
     ]);
 
     let contentHtml = post.body || '<p>Isi konten belum ditulis...</p>';
+    let isPuck = false;
 
     // Deteksi apakah body adalah JSON Puck
     if (contentHtml.trim().startsWith('{') && contentHtml.trim().endsWith('}')) {
       try {
         const puckData = JSON.parse(contentHtml);
         if (puckData.content) {
+          isPuck = true;
           // Render SSR dengan React
           contentHtml = ReactDOMServer.renderToString(
             React.createElement(PuckRender, {
@@ -687,18 +689,24 @@ const LabMuPro: ThemeStructure = {
     }
 
     // Halaman biasanya menggunakan layout full width (tanpa sidebar)
-    const html = `
-      <article>
-        ${breadcrumbs}
-        <div class="entry-header">
-           <h1 class="entry-title">${post.title}</h1>
-        </div>
-        ${post.featured_image ? `<img src="${post.featured_image}" class="entry-image" alt="${post.title}" loading="lazy">` : ''}
-        <div class="entry-content">
-          ${contentHtml}
-        </div>
-      </article>
-    `;
+    let html = '';
+    if (isPuck) {
+      // Jika Puck, jangan beri wrapper agar bisa full width / bebas
+      html = contentHtml;
+    } else {
+      html = `
+        <article>
+          ${breadcrumbs}
+          <div class="entry-header">
+             <h1 class="entry-title">${post.title}</h1>
+          </div>
+          ${post.featured_image ? `<img src="${post.featured_image}" class="entry-image" alt="${post.title}" loading="lazy">` : ''}
+          <div class="entry-content">
+            ${contentHtml}
+          </div>
+        </article>
+      `;
+    }
     
     return this._layout(html, post.title, ctx, 'layout-full-width');
   },
