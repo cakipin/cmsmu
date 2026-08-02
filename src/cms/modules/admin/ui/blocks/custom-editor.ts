@@ -72,29 +72,7 @@ export const customEditorTemplate = `
          @keydown.enter="handleEnter">
     </div>
 
-    <!-- Image Floating Toolbar (centered above image) -->
-    <div x-show="imageMenuOpen" 
-         x-cloak
-         x-transition.scale.origin.bottom
-         style="position: fixed; z-index: 99999; background: #1e293b; border-radius: 8px; padding: 4px 6px; display: flex; gap: 2px; box-shadow: 0 8px 25px rgba(0,0,0,0.25); pointer-events: auto;"
-         :style="'top: ' + imageMenuPos.top + 'px; left: ' + imageMenuPos.left + 'px; transform: translateX(-50%);'">
-         <button @click.prevent="alignImage('left')" type="button" class="img-toolbar-btn" :class="{'img-toolbar-active': currentImageAlign === 'left'}" title="Rata Kiri">
-             <i class="fas fa-align-left"></i>
-         </button>
-         <button @click.prevent="alignImage('center')" type="button" class="img-toolbar-btn" :class="{'img-toolbar-active': currentImageAlign === 'center'}" title="Tengah">
-             <i class="fas fa-align-center"></i>
-         </button>
-         <button @click.prevent="alignImage('right')" type="button" class="img-toolbar-btn" :class="{'img-toolbar-active': currentImageAlign === 'right'}" title="Rata Kanan">
-             <i class="fas fa-align-right"></i>
-         </button>
-         <div style="width: 1px; background: rgba(255,255,255,0.2); margin: 4px 2px;"></div>
-         <button @click.prevent="alignImage('none')" type="button" class="img-toolbar-btn" title="Reset Posisi">
-             <i class="fas fa-undo"></i>
-         </button>
-         <button @click.prevent="removeImage()" type="button" class="img-toolbar-btn img-toolbar-delete" title="Hapus Gambar">
-             <i class="fas fa-trash-alt"></i>
-         </button>
-    </div>
+    <!-- Image toolbar is injected via JS in initEditor -->
 
     <style>
         .editor-btn {
@@ -146,9 +124,7 @@ function customEditorLogic() {
         linkUrl: '',
         
         selectedImage: null,
-        imageMenuOpen: false,
-        imageMenuPos: { top: 0, left: 0 },
-        currentImageAlign: 'none',
+        _imgToolbar: null,
         
         initEditor(initialContent) {
             this.$watch('form.body', (val) => {
@@ -162,6 +138,38 @@ function customEditorLogic() {
                 }
             }, 100);
             
+            // Create image toolbar element (pure DOM, no Alpine dependency)
+            if (!this._imgToolbar) {
+                const tb = document.createElement('div');
+                tb.className = 'img-floating-toolbar';
+                tb.style.cssText = 'position:fixed; z-index:99999; background:#1e293b; border-radius:8px; padding:4px 6px; display:none; gap:2px; box-shadow:0 8px 25px rgba(0,0,0,0.25); pointer-events:auto;';
+                tb.innerHTML = 
+                    '<button class="img-toolbar-btn" data-align="left" title="Rata Kiri"><i class="fas fa-align-left"></i></button>' +
+                    '<button class="img-toolbar-btn" data-align="center" title="Tengah"><i class="fas fa-align-center"></i></button>' +
+                    '<button class="img-toolbar-btn" data-align="right" title="Rata Kanan"><i class="fas fa-align-right"></i></button>' +
+                    '<span style="width:1px; background:rgba(255,255,255,0.2); margin:4px 2px;"></span>' +
+                    '<button class="img-toolbar-btn" data-align="none" title="Reset"><i class="fas fa-undo"></i></button>' +
+                    '<button class="img-toolbar-btn img-toolbar-delete" data-action="delete" title="Hapus"><i class="fas fa-trash-alt"></i></button>';
+                document.body.appendChild(tb);
+                this._imgToolbar = tb;
+                
+                // Button click handlers
+                const self = this;
+                tb.querySelectorAll('button[data-align]').forEach(btn => {
+                    btn.addEventListener('mousedown', (ev) => {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        self.alignImage(btn.dataset.align);
+                        self._updateToolbarActive(btn.dataset.align);
+                    });
+                });
+                tb.querySelector('button[data-action="delete"]')?.addEventListener('mousedown', (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    self.removeImage();
+                });
+            }
+            
             // Image click listener — show floating toolbar above the image
             this.$refs.editor.addEventListener('click', (e) => {
                 // Remove previous selection highlight
@@ -174,30 +182,31 @@ function customEditorLogic() {
                     // Detect current alignment
                     const fl = e.target.style.float;
                     const mx = e.target.style.margin;
-                    if (fl === 'left') this.currentImageAlign = 'left';
-                    else if (fl === 'right') this.currentImageAlign = 'right';
-                    else if (mx && mx.includes('auto')) this.currentImageAlign = 'center';
-                    else this.currentImageAlign = 'none';
+                    let align = 'none';
+                    if (fl === 'left') align = 'left';
+                    else if (fl === 'right') align = 'right';
+                    else if (mx && mx.includes('auto')) align = 'center';
                     
-                    // Position toolbar centered above the image (viewport coords)
+                    // Position toolbar centered above the image
                     const rect = e.target.getBoundingClientRect();
-                    this.imageMenuPos = {
-                        top: rect.top - 48,
-                        left: rect.left + rect.width / 2
-                    };
-                    this.imageMenuOpen = true;
+                    const tb = this._imgToolbar;
+                    tb.style.display = 'flex';
+                    const top = Math.max(8, rect.top - 44);
+                    tb.style.top = top + 'px';
+                    tb.style.left = (rect.left + rect.width / 2) + 'px';
+                    tb.style.transform = 'translateX(-50%)';
+                    this._updateToolbarActive(align);
                 } else {
-                    this.imageMenuOpen = false;
-                    this.selectedImage = null;
+                    this._hideToolbar();
                 }
             });
             
-            // Hide toolbar on scroll so it doesn't drift
-            this.$refs.editor.addEventListener('scroll', () => {
-                if (this.imageMenuOpen) {
-                    this.imageMenuOpen = false;
-                    this.$refs.editor.querySelectorAll('img.img-selected').forEach(i => i.classList.remove('img-selected'));
-                    this.selectedImage = null;
+            // Hide toolbar on scroll
+            this.$refs.editor.addEventListener('scroll', () => this._hideToolbar());
+            // Hide on click outside editor
+            document.addEventListener('click', (e) => {
+                if (this._imgToolbar && !this._imgToolbar.contains(e.target) && !this.$refs.editor?.contains(e.target)) {
+                    this._hideToolbar();
                 }
             });
             
@@ -220,10 +229,6 @@ function customEditorLogic() {
         checkSelection() {
             this.updateActiveFormats();
             this.saveSelection();
-            if (this.imageMenuOpen && window.getSelection().toString().length > 0) {
-                this.imageMenuOpen = false;
-                this.selectedImage = null;
-            }
         },
         
         updateActiveFormats() {
@@ -312,9 +317,21 @@ function customEditorLogic() {
         removeImage() {
             if (!this.selectedImage) return;
             this.selectedImage.remove();
-            this.imageMenuOpen = false;
-            this.selectedImage = null;
+            this._hideToolbar();
             this.updateContent();
+        },
+        
+        _hideToolbar() {
+            if (this._imgToolbar) this._imgToolbar.style.display = 'none';
+            this.selectedImage = null;
+            this.$refs.editor?.querySelectorAll('img.img-selected').forEach(i => i.classList.remove('img-selected'));
+        },
+        
+        _updateToolbarActive(align) {
+            if (!this._imgToolbar) return;
+            this._imgToolbar.querySelectorAll('.img-toolbar-btn[data-align]').forEach(btn => {
+                btn.classList.toggle('img-toolbar-active', btn.dataset.align === align);
+            });
         },
         
         saveSelection() {
