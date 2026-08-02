@@ -18,4 +18,5 @@ export interface ThemeStructure {
   renderSingle(ctx: ThemeContext): string;
   renderPage(ctx: ThemeContext): string;
   render404(ctx: ThemeContext): string;
+  [key: string]: any; // Allow custom methods like _layout
 }

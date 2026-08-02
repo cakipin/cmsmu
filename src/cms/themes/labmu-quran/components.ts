@@ -26,6 +26,4 @@ export const renderHeader = (ctx: ThemeContext) => `
         </button>
     </div>
   </header>
-`;
-  </footer>
-`;
+`;

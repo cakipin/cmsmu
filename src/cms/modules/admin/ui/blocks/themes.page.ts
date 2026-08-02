@@ -10,7 +10,8 @@ export const themesPage = `
             theme_text: '#1a1a2e',
             theme_accent: '#f0f7ff',
             header_logo_url: '',
-            header_menu_position: 'right'
+            header_menu_position: 'right',
+            header_text_color: '#334155'
         },
 
         async openThemeEditor() {
@@ -28,6 +29,7 @@ export const themesPage = `
                     if (d.theme_accent)       this.themeColors.theme_accent       = d.theme_accent;
                     if (d.header_logo_url)    this.themeColors.header_logo_url    = d.header_logo_url;
                     if (d.header_menu_position) this.themeColors.header_menu_position = d.header_menu_position;
+                    if (d.header_text_color)  this.themeColors.header_text_color  = d.header_text_color;
                 }
             } catch(e) {}
             this.themeEditorOpen = true;
@@ -60,7 +62,8 @@ export const themesPage = `
                 theme_text: '#1a1a2e',
                 theme_accent: '#f0f7ff',
                 header_logo_url: '',
-                header_menu_position: 'right'
+                header_menu_position: 'right',
+                header_text_color: '#334155'
             };
         }
      }">
@@ -140,6 +143,14 @@ export const themesPage = `
                   <option value="center">Tengah</option>
                   <option value="left">Kiri</option>
                 </select>
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:#4b5563; margin-bottom:6px;">Warna Teks Header</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input type="color" x-model="themeColors.header_text_color" style="width:40px; height:34px; padding:2px; border:1px solid #d1d5db; border-radius:5px; cursor:pointer; flex-shrink:0;">
+                <input type="text" x-model="themeColors.header_text_color" style="flex:1; padding:7px; border:1px solid #d1d5db; border-radius:5px; font-size:12px; font-family:monospace;">
               </div>
             </div>
 

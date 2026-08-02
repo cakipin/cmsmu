@@ -2,27 +2,21 @@ import type { ThemeContext } from '../../themes/types';
 
 // --- 1. HEADER (DENGAN BURGER MENU & DROPDOWN) ---
 export const renderHeader = (ctx: ThemeContext) => {
-  const headerConfig = ctx.themeConfig?.header || {};
-  
-  // Custom Logo
-  const logoContent = headerConfig.logoUrl 
-    ? `<img src="${headerConfig.logoUrl}" alt="${ctx.site.title} Logo" style="max-height: 40px;">` 
+  const logoContent = ctx.site?.header_logo_url 
+    ? `<img src="${ctx.site.header_logo_url}" alt="${ctx.site.title} Logo" style="max-height: 40px;">` 
     : `<i class="fas fa-layer-group"></i> <span>${ctx.site.title}</span>`;
   
-  // Custom Header Color
-  const headerStyle = headerConfig.backgroundColor ? `background-color: ${headerConfig.backgroundColor} !important; border-color: ${headerConfig.backgroundColor} !important;` : '';
-  const textStyle = headerConfig.textColor ? `color: ${headerConfig.textColor} !important;` : '';
+  const textStyle = `color: ${ctx.site?.header_text_color || 'var(--header-text)'} !important;`;
   
-  // Custom Menu Position
   let menuWrapperStyle = '';
-  if (headerConfig.menuPosition === 'center') {
+  if (ctx.site?.header_menu_position === 'center') {
     menuWrapperStyle = 'margin: 0 auto;';
-  } else if (headerConfig.menuPosition === 'left') {
+  } else if (ctx.site?.header_menu_position === 'left') {
     menuWrapperStyle = 'margin-right: auto; margin-left: 2rem;';
   }
 
   return `
-  <header class="pro-header" style="${headerStyle}">
+  <header class="pro-header">
     <div class="container header-inner">
       <a href="/" class="logo" style="${textStyle}">
         ${logoContent}
@@ -41,10 +35,10 @@ export const renderHeader = (ctx: ThemeContext) => {
         </div>
         <a href="#" class="nav-link" style="${textStyle}">Blog</a>
         <a href="#" class="nav-link" style="${textStyle}">About</a>
-        <a href="#" class="btn btn-primary" style="padding: 0.5rem 1.25rem;">Contact</a>
-        <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle Dark Mode" style="${textStyle}">
+        <a href="#" class="btn btn-primary" style="padding: 0.5rem 1.25rem; color: white !important;">Contact</a>
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle Dark Mode" style="${textStyle}; background:none; border:none; font-size:1.2rem; cursor:pointer;">
            <i class="fas fa-moon icon-moon"></i>
-           <i class="fas fa-sun icon-sun"></i>
+           <i class="fas fa-sun icon-sun" style="display:none;"></i>
         </button>
       </nav>
 
@@ -78,7 +72,7 @@ export const renderHero = (ctx: ThemeContext) => `
       <h1 class="hero-title">Starter Framework LabMu Pro</h1>
       <p class="hero-subtitle">Tema boilerplate modern dengan Grid, Dark Mode, Komponen UI interaktif, dan optimasi performa tinggi untuk membangun web yang cepat.</p>
       <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-         <a href="#" class="btn btn-primary">Mulai Sekarang &rarr;</a>
+         <a href="/admin" class="btn-hero">Mulai Sekarang &rarr;</a>
          <a href="#" class="btn btn-outline" style="color:white; border-color:white;">Lihat Dokumentasi</a>
       </div>
     </div>
@@ -113,12 +107,11 @@ export const renderSidebar = (posts: any[]) => `
     </div>
 
     <div class="widget">
-      <h4 class="widget-title">Kategori</h4>
+      <h4 class="widget-title">Tags</h4>
       <div style="display:flex; flex-wrap:wrap; gap:5px;">
-         <span class="badge">Teknologi</span>
-         <span class="badge">Coding</span>
-         <span class="badge">Bisnis</span>
-         <span class="badge">Desain</span>
+         <a href="/search?q=teknologi" style="background:#f1f5f9; padding:5px 10px; border-radius:4px; font-size:12px;">Teknologi</a>
+         <a href="/search?q=coding" style="background:#f1f5f9; padding:5px 10px; border-radius:4px; font-size:12px;">Coding</a>
+         <a href="/search?q=bisnis" style="background:#f1f5f9; padding:5px 10px; border-radius:4px; font-size:12px;">Bisnis</a>
       </div>
     </div>
     <!-- Hook: after_sidebar -->
@@ -155,11 +148,11 @@ export const renderFooter = (ctx: ThemeContext) => `
 
         <div class="footer-col">
            <h4>Bantuan</h4>
-           <ul class="footer-links">
-              <li><a href="#">Pusat Bantuan</a></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
-              <li><a href="#">FAQ</a></li>
+           <ul class="widget-list footer-links" style="border:none;">
+              <li><a href="/">Home</a></li>
+              <li><a href="/privacy-policy">Privacy Policy</a></li>
+              <li><a href="/terms-of-service">Terms of Service</a></li>
+           </ul>   <li><a href="#">FAQ</a></li>
            </ul>
         </div>
         

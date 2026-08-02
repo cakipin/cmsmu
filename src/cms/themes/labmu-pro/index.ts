@@ -99,7 +99,17 @@ const LabMuPro: ThemeStructure = {
         <!-- Icons -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         
-        <style>${css}</style>
+        <style>
+          :root {
+            --primary: ${ctx.site?.theme_primary || '#2563eb'};
+            --bg-body: ${ctx.site?.theme_bg || '#f8fafc'};
+            --bg-card: ${ctx.site?.theme_bg || '#ffffff'};
+            --text-main: ${ctx.site?.theme_text || '#334155'};
+            --accent: ${ctx.site?.theme_accent || '#f59e0b'};
+            --header-text: ${ctx.site?.header_text_color || '#334155'};
+          }
+          ${css}
+        </style>
       </head>
       <body>
         <!-- Hook: before_header -->
