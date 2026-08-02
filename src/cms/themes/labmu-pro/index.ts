@@ -93,22 +93,22 @@ const LabMuPro: ThemeStructure = {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${title} - ${ctx.site.site_title || 'CMSMu'}</title>
-        <meta name="description" content="${ctx.data?.excerpt || ctx.site.site_desc || ''}">
+        <title>${title} - ${ctx.site?.site_title || 'CMSMu'}</title>
+        <meta name="description" content="${ctx.data?.excerpt || ctx.site?.site_desc || ''}">
         
         <!-- Favicon -->
-        <link rel="icon" type="image/x-icon" href="${ctx.site.site_favicon || '/favicon.svg'}">
+        <link rel="icon" type="image/x-icon" href="${ctx.site?.site_favicon || '/favicon.svg'}">
         
         <!-- Open Graph / Social Media Meta Tags -->
-        <meta property="og:title" content="${title} - ${ctx.site.site_title || 'CMSMu'}">
-        <meta property="og:description" content="${ctx.data?.excerpt || ctx.site.site_desc || ''}">
+        <meta property="og:title" content="${title} - ${ctx.site?.site_title || 'CMSMu'}">
+        <meta property="og:description" content="${ctx.data?.excerpt || ctx.site?.site_desc || ''}">
         <meta property="og:image" content="${ctx.data?.featured_image || ctx.site?.header_logo_url || ctx.site?.site_logo || ''}">
         <meta property="og:type" content="${ctx.data?.type === 'post' ? 'article' : 'website'}">
         
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="${title} - ${ctx.site.site_title || 'CMSMu'}">
-        <meta name="twitter:description" content="${ctx.data?.excerpt || ctx.site.site_desc || ''}">
+        <meta name="twitter:title" content="${title} - ${ctx.site?.site_title || 'CMSMu'}">
+        <meta name="twitter:description" content="${ctx.data?.excerpt || ctx.site?.site_desc || ''}">
         <meta name="twitter:image" content="${ctx.data?.featured_image || ctx.site?.header_logo_url || ctx.site?.site_logo || ''}">
         
         <!-- Preconnect & Fonts -->

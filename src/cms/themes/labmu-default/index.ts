@@ -155,7 +155,7 @@ const LabMuDefault: ThemeStructure = {
 
     const tagsHtml = post.tags
       ? `<div class="post-tags">${post.tags.split(',').map((t: string) => t.trim()).filter(Boolean).map((t: string) =>
-          `<a href="/${t.toLowerCase().replace(/\s+/g,'-')}" class="post-tag">#${t}</a>`
+          `<a href="/search?q=${encodeURIComponent(t)}" class="post-tag">#${t}</a>`
         ).join('')}</div>`
       : '';
 

@@ -19,11 +19,11 @@ export const renderHeader = (ctx: ThemeContext) => {
 
   const menus = ctx.menus || [];
   const desktopMenuHtml = menus.length > 0 
-    ? menus.map((m: any) => `<a href="${m.url}" class="nav-link" style="${textStyle}">${m.title}</a>`).join('\n        ')
+    ? menus.map((m: any) => `<a href="${m.url}" class="nav-link" style="${textStyle}">${m.label || m.title}</a>`).join('\n        ')
     : `<a href="/" class="nav-link" style="${textStyle}">Home</a>`;
 
   const mobileMenuHtml = menus.length > 0
-    ? menus.map((m: any) => `<a href="${m.url}" class="nav-link">${m.title}</a>`).join('\n    ')
+    ? menus.map((m: any) => `<a href="${m.url}" class="nav-link">${m.label || m.title}</a>`).join('\n    ')
     : `<a href="/" class="nav-link">Home</a>`;
 
   return `
@@ -201,7 +201,7 @@ export const renderFooter = (ctx: ThemeContext) => `
            <a href="/" class="logo" style="color:white; margin-bottom:1rem; display:inline-flex;">
              <i class="fas fa-layer-group"></i> LabMu Pro
            </a>
-           <p style="opacity:0.8; font-size:var(--text-sm); margin-bottom:1rem;">${ctx.site.site_desc || 'Website modern berbasis Cloudflare.'}</p>
+           <p style="opacity:0.8; font-size:var(--text-sm); margin-bottom:1rem;">${ctx.site?.site_desc || 'Website modern berbasis Cloudflare.'}</p>
            <div class="social-share" style="border:none; padding:0; margin:0;">
              <a href="#" class="share-btn share-fb" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
              <a href="#" class="share-btn share-tw" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
@@ -225,7 +225,7 @@ export const renderFooter = (ctx: ThemeContext) => `
               <li><a href="/">Home</a></li>
               <li><a href="/privacy-policy">Privacy Policy</a></li>
               <li><a href="/terms-of-service">Terms of Service</a></li>
-           </ul>   <li><a href="#">FAQ</a></li>
+              <li><a href="#">FAQ</a></li>
            </ul>
         </div>
         
@@ -240,7 +240,7 @@ export const renderFooter = (ctx: ThemeContext) => `
       </div>
       
       <div class="footer-bottom">
-         &copy; ${new Date().getFullYear()} ${ctx.site.title}. All rights reserved. Built with LabMu CMS Framework.
+         &copy; ${new Date().getFullYear()} ${ctx.site?.site_title || 'CMSMu'}. All rights reserved. Built with LabMu CMS Framework.
       </div>
     </div>
     <!-- Hook: after_footer -->

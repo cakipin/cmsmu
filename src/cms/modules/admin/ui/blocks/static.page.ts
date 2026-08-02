@@ -363,7 +363,7 @@ export const staticPage = `
                         <div style="color:#9ca3af; font-size:12px; margin-top:5px;">Klik untuk memilih dari library</div>
                     </div>
 
-                    <div x-show="form.featured_image" style="position:relative; group">
+                    <div x-show="form.featured_image" style="position:relative;">
                         <div style="width:100%; aspect-ratio:16/9; background:#eee; position:relative; overflow:hidden;">
                             <img :src="form.featured_image" 
                                  style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s;"
@@ -551,7 +551,7 @@ export const staticPage = `
                          <div style="padding-top:20px; border-top:1px solid #e5e7eb;">
                             <button type="button" @click="uploadMediaAction()" :disabled="!uploadFile"
                                     style="width:100%; background:#2563eb; color:white; border:none; padding:12px; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s;"
-                                    :style="!uploadFile ? 'opacity:0.5; cursor:not-allowed;' : 'hover:bg-blue-700'">
+                                    :style="!uploadFile ? 'opacity:0.5; cursor:not-allowed;' : ''">
                                 <i class="fas fa-cloud-upload-alt"></i> Upload & Gunakan
                             </button>
                          </div>
