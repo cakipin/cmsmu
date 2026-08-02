@@ -12,10 +12,22 @@ themeEditorRouter.get('/page', async (c) => {
   if (!slug) return c.json({ error: 'Slug required' }, 400);
 
   try {
-    const page = await c.env.DB.prepare('SELECT body FROM pages WHERE slug = ?').bind(slug).first();
+    const page: any = await c.env.DB.prepare('SELECT body FROM pages WHERE slug = ?').bind(slug).first();
     if (page) {
       return c.json({ success: true, data: page });
     } else {
+      if (slug === 'home') {
+        // Pre-fill default layout for the home page so they can edit it immediately
+        const defaultHomePuck = {
+          content: [
+            { type: "Hero", props: { id: "Hero-1", title: "Bangun Bisnis Kreatif Anda", description: "Lembaga Ekonomi Kreatif Muhammadiyah hadir untuk mendampingi pelaku UMKM, kreator, dan inovator digital.", buttonText: "Daftar Inkubasi", buttonLink: "#", backgroundImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070" } },
+            { type: "FeatureGrid", props: { id: "FeatureGrid-1", title: "Keunggulan", features: [{ title: "Inovasi", description: "Inovasi teknologi digital.", icon: "🚀" }, { title: "Kolaborasi", description: "Jaringan luas dan bersinergi.", icon: "🤝" }] } }
+          ],
+          root: { props: { title: "Beranda Utama" } },
+          zones: {}
+        };
+        return c.json({ success: true, data: { body: JSON.stringify(defaultHomePuck) } });
+      }
       return c.json({ success: true, data: null }); // Data belum ada
     }
   } catch (e: any) {

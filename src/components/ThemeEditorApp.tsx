@@ -128,8 +128,15 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
   }
 
   // Cek apakah slug saat ini ada di daftar pages, jika tidak tambahkan sementara
-  const currentInPages = pages.find(p => p.slug === slug);
-  const displayPages = currentInPages ? pages : [...pages, { id: 0, title: slug + ' (Baru)', slug: slug }];
+  let displayPages = [...pages];
+  
+  if (!displayPages.find(p => p.slug === 'home')) {
+    displayPages.unshift({ id: -1, title: 'Beranda Utama', slug: 'home' });
+  }
+
+  if (!displayPages.find(p => p.slug === slug)) {
+    displayPages.push({ id: 0, title: slug + ' (Baru)', slug: slug });
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
