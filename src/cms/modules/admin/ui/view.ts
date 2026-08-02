@@ -65,6 +65,7 @@ export function renderAdmin(data: any): string {
                     { group: 'Content', title: 'Add Page', view: 'add-page', icon: 'fas fa-plus-square', action: () => { window.editingPageId = null; } },
                     { group: 'Content', title: 'Media', view: 'media', icon: 'fas fa-photo-video', action: () => typeof loadMedia === 'function' && loadMedia() },
                     { group: 'Appearance', title: 'Themes', view: 'themes', icon: 'fas fa-paint-brush', role: ['admin', 'editor'] },
+                    { group: 'Appearance', title: 'Theme Editor', href: '/theme-editor', icon: 'fas fa-laptop-code', role: ['admin'] },
                     { group: 'Appearance', title: 'Menus', view: 'menus', icon: 'fas fa-bars', role: ['admin', 'editor'] },
                     { group: 'System', title: 'Users', view: 'users', icon: 'fas fa-users', role: ['admin'], action: () => typeof loadUsers === 'function' && loadUsers() },
                     { group: 'System', title: 'Settings', view: 'settings', icon: 'fas fa-cog', role: ['admin'] }

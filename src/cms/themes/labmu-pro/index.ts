@@ -96,6 +96,9 @@ const LabMuPro: ThemeStructure = {
         <title>${title} - ${ctx.site.site_title || 'CMSMu'}</title>
         <meta name="description" content="${ctx.data?.excerpt || ctx.site.site_desc || ''}">
         
+        <!-- Favicon -->
+        <link rel="icon" type="image/x-icon" href="${ctx.site.site_favicon || '/favicon.svg'}">
+        
         <!-- Open Graph / Social Media Meta Tags -->
         <meta property="og:title" content="${title} - ${ctx.site.site_title || 'CMSMu'}">
         <meta property="og:description" content="${ctx.data?.excerpt || ctx.site.site_desc || ''}">
