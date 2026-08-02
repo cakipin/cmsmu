@@ -20,7 +20,7 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
   };
 
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('cmsMu_token') || '' : '';
+    const token = typeof window !== 'undefined' ? localStorage.getItem('labmu_token') || '' : '';
     
     // Fetch page list
     const fetchPages = async () => {
@@ -81,7 +81,7 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
         body: JSON.stringify(data),
       };
 
-      const token = typeof window !== 'undefined' ? localStorage.getItem('cmsMu_token') || '' : '';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('labmu_token') || '' : '';
       const response = await fetch("/api/theme-editor/page", {
         method: "POST",
         headers: {

@@ -11,9 +11,16 @@ export type Props = {
     buttonText: string;
     buttonLink: string;
   };
+  HeroSlider: {
+    slides: { image: string; title: string; subtitle: string; buttonText: string; buttonLink: string }[];
+  };
   FeatureGrid: {
     title: string;
     features: { title: string; description: string; icon: string }[];
+  };
+  Testimonial: {
+    title: string;
+    testimonials: { name: string; role: string; content: string; avatar: string }[];
   };
   ContactForm: {
     heading: string;
@@ -21,6 +28,13 @@ export type Props = {
   };
   RichText: {
     content: string;
+  };
+  CustomHTML: {
+    html: string;
+  };
+  GoogleMap: {
+    iframeUrl: string;
+    height: number;
   };
   Spacer: {
     height: number;
@@ -165,6 +179,140 @@ export const puckConfig: Config<Props> = {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate prose-green lg:prose-lg" dangerouslySetInnerHTML={{ __html: content }} />
         </section>
       ),
+    },
+    HeroSlider: {
+      fields: {
+        slides: {
+          type: "array",
+          arrayFields: {
+            image: { type: "text" },
+            title: { type: "text" },
+            subtitle: { type: "textarea" },
+            buttonText: { type: "text" },
+            buttonLink: { type: "text" },
+          },
+        },
+      },
+      defaultProps: {
+        slides: [
+          {
+            image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070",
+            title: "Selamat Datang",
+            subtitle: "Kami siap membantu Anda",
+            buttonText: "Pelajari Lebih Lanjut",
+            buttonLink: "#",
+          }
+        ],
+      },
+      render: ({ slides }) => (
+        <section className="relative w-full overflow-hidden bg-slate-900 group" style={{ minHeight: '60vh', maxHeight: '80vh' }}>
+          {slides.map((slide, i) => (
+            <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${i === 0 ? 'opacity-100 relative z-10' : 'opacity-0 z-0 hidden'}`}>
+              <img src={slide.image} alt={slide.title} className="w-full h-full object-cover opacity-60" />
+              <div className="absolute inset-0 bg-black/40"></div>
+              <div className="absolute inset-0 flex items-center justify-center text-center px-4">
+                <div className="max-w-4xl">
+                  <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">{slide.title}</h2>
+                  <p className="text-lg md:text-2xl text-slate-200 mb-8">{slide.subtitle}</p>
+                  {slide.buttonText && (
+                    <a href={slide.buttonLink} className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full transition shadow-lg">
+                      {slide.buttonText}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+          {/* Note: In a real slider, you would include a client-side script to cycle through slides. For Puck SSR, we show the first slide. */}
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
+            {slides.map((_, i) => (
+              <div key={i} className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/50'}`}></div>
+            ))}
+          </div>
+        </section>
+      ),
+    },
+    Testimonial: {
+      fields: {
+        title: { type: "text" },
+        testimonials: {
+          type: "array",
+          arrayFields: {
+            name: { type: "text" },
+            role: { type: "text" },
+            content: { type: "textarea" },
+            avatar: { type: "text" },
+          }
+        }
+      },
+      defaultProps: {
+        title: "Apa Kata Mereka",
+        testimonials: [
+          { name: "Ahmad", role: "Pengusaha", content: "Layanan sangat memuaskan dan profesional.", avatar: "https://placehold.co/100x100?text=A" }
+        ]
+      },
+      render: ({ title, testimonials }) => (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">{title}</h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              {testimonials.map((t, i) => (
+                <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm relative">
+                  <div className="text-green-500 text-4xl absolute top-4 right-6 opacity-20">"</div>
+                  <p className="text-slate-600 italic mb-6 relative z-10">"{t.content}"</p>
+                  <div className="flex items-center gap-4">
+                    <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full object-cover" />
+                    <div>
+                      <h4 className="font-bold text-slate-900">{t.name}</h4>
+                      <p className="text-sm text-slate-500">{t.role}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    },
+    CustomHTML: {
+      fields: {
+        html: { type: "textarea" }
+      },
+      defaultProps: {
+        html: "<div class='text-center p-8 bg-slate-100 rounded-lg'>Halo, ini Custom HTML!</div>"
+      },
+      render: ({ html }) => (
+        <div dangerouslySetInnerHTML={{ __html: html }} />
+      )
+    },
+    GoogleMap: {
+      fields: {
+        iframeUrl: { type: "text" },
+        height: { type: "number" }
+      },
+      defaultProps: {
+        iframeUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126920.24058206412!2d106.7583637119043!3d-6.229746499878206!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d%3A0x100c5e82dd4b820!2sJakarta!5e0!3m2!1sen!2sid!4v1700000000000",
+        height: 400
+      },
+      render: ({ iframeUrl, height }) => (
+        <section className="w-full">
+          {iframeUrl.startsWith('<iframe') ? (
+            // Jika user memasukkan seluruh tag <iframe>
+            <div style={{ height: `${height}px`, width: '100%' }} dangerouslySetInnerHTML={{ __html: iframeUrl }} />
+          ) : (
+            // Jika user hanya memasukkan URL src
+            <iframe 
+              src={iframeUrl} 
+              width="100%" 
+              height={height} 
+              style={{ border: 0 }} 
+              allowFullScreen={true} 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade">
+            </iframe>
+          )}
+        </section>
+      )
     },
     Spacer: {
       fields: {
