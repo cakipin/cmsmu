@@ -3,8 +3,9 @@ import type { ThemeContext } from '../../themes/types';
 // --- 1. HEADER (DENGAN BURGER MENU & DROPDOWN) ---
 export const renderHeader = (ctx: ThemeContext) => {
   const siteTitle = ctx.site?.site_title || ctx.site?.title || 'CMSMu';
-  const logoContent = ctx.site?.site_logo 
-    ? `<img src="${ctx.site.site_logo}" alt="${siteTitle} Logo" style="max-height: 40px;">` 
+  const logoUrl = ctx.site?.header_logo_url || ctx.site?.site_logo;
+  const logoContent = logoUrl 
+    ? `<img src="${logoUrl}" alt="${siteTitle} Logo" style="max-height: 40px;">` 
     : `<i class="fas fa-layer-group"></i> <span>${siteTitle}</span>`;
   
   const textStyle = `color: ${ctx.site?.header_text_color || 'var(--header-text)'} !important;`;

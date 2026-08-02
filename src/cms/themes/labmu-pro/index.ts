@@ -102,14 +102,14 @@ const LabMuPro: ThemeStructure = {
         <!-- Open Graph / Social Media Meta Tags -->
         <meta property="og:title" content="${title} - ${ctx.site.site_title || 'CMSMu'}">
         <meta property="og:description" content="${ctx.data?.excerpt || ctx.site.site_desc || ''}">
-        <meta property="og:image" content="${ctx.data?.featured_image || ctx.site?.site_logo || ''}">
+        <meta property="og:image" content="${ctx.data?.featured_image || ctx.site?.header_logo_url || ctx.site?.site_logo || ''}">
         <meta property="og:type" content="${ctx.data?.type === 'post' ? 'article' : 'website'}">
         
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="${title} - ${ctx.site.site_title || 'CMSMu'}">
         <meta name="twitter:description" content="${ctx.data?.excerpt || ctx.site.site_desc || ''}">
-        <meta name="twitter:image" content="${ctx.data?.featured_image || ctx.site?.site_logo || ''}">
+        <meta name="twitter:image" content="${ctx.data?.featured_image || ctx.site?.header_logo_url || ctx.site?.site_logo || ''}">
         
         <!-- Preconnect & Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -259,8 +259,8 @@ const LabMuPro: ThemeStructure = {
             <div class="w-full px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-20">
                     <a href="/" class="flex-shrink-0 flex items-center gap-2 decoration-transparent">
-                        ${ctx.site?.site_logo 
-                          ? `<img src="${ctx.site.site_logo}" alt="${ctx.site?.site_title || 'Logo'}" class="h-10 w-auto">` 
+                        ${(ctx.site?.header_logo_url || ctx.site?.site_logo)
+                          ? `<img src="${ctx.site.header_logo_url || ctx.site.site_logo}" alt="${ctx.site?.site_title || 'Logo'}" class="h-10 w-auto">` 
                           : `<div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-xl">${(ctx.site?.site_title || 'E').charAt(0)}</div>
                              <span class="font-bold text-xl text-slate-900">${ctx.site?.site_title || 'Ekraf<span class="text-green-600">Mu</span>'}</span>`
                         }
@@ -484,8 +484,8 @@ const LabMuPro: ThemeStructure = {
         <footer class="bg-white py-10 border-t border-slate-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
                 <div class="flex items-center gap-2 mb-4 md:mb-0">
-                    ${ctx.site?.header_logo_url 
-                      ? `<img src="${ctx.site.header_logo_url}" alt="${ctx.site?.site_title || 'Logo'}" class="h-8 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition">` 
+                    ${(ctx.site?.header_logo_url || ctx.site?.site_logo) 
+                      ? `<img src="${ctx.site.header_logo_url || ctx.site.site_logo}" alt="${ctx.site?.site_title || 'Logo'}" class="h-8 w-auto grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition">` 
                       : `<div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">${(ctx.site?.site_title || 'E').charAt(0)}</div>
                          <span class="font-bold text-lg text-slate-900">${ctx.site?.site_title || 'Ekraf<span class="text-green-600">Mu</span>'}</span>`
                     }

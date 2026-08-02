@@ -41,8 +41,9 @@ const LabMuDefault: ThemeStructure = {
       </nav>
     ` : '';
 
-    const logoHtml = site.site_logo
-      ? `<img src="${site.site_logo}" alt="${siteTitle} Logo">`
+    const logoUrl = site.header_logo_url || site.site_logo;
+    const logoHtml = logoUrl
+      ? `<img src="${logoUrl}" alt="${siteTitle} Logo">`
       : '';
 
     return `<!DOCTYPE html>
