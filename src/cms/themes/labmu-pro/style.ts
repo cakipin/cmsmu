@@ -271,4 +271,91 @@ h1, h2, h3, h4, h5, h6 { color: var(--text-main); font-weight: 700; line-height:
 .footer-links a { color: #cbd5e1; transition: color 0.2s; }
 .footer-links a:hover { color: white; padding-left: 4px; }
 .footer-bottom { border-top: 1px solid #334155; padding-top: 1.5rem; text-align: center; font-size: var(--text-sm); }
+
+/* ==========================================================================
+   7. LANDING PAGE & CUSTOM MODULES
+   ========================================================================== */
+.landing-hero {
+  background: var(--bg-body);
+  color: var(--text-main);
+  padding: 60px 0 40px;
+  text-align: center;
+}
+.landing-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.1;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.landing-subtitle {
+  font-size: var(--text-lg);
+  color: var(--text-muted);
+  max-width: 700px;
+  margin: 0 auto 30px auto;
+}
+
+/* Curved Grid Showcase */
+.curved-showcase {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 40px;
+  perspective: 1000px;
+  padding: 0 10px;
+}
+.curved-showcase-item {
+  position: relative;
+  height: 350px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.5s ease;
+}
+/* Side images slightly tilted back/smaller */
+.curved-showcase-item:nth-child(1) {
+  transform: rotateY(15deg) scale(0.9) translateZ(-50px);
+  transform-origin: right center;
+  border-radius: 20px 5px 5px 20px;
+}
+.curved-showcase-item:nth-child(2) {
+  transform: scale(1.05) translateZ(20px);
+  z-index: 2;
+  border-radius: 10px;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+.curved-showcase-item:nth-child(3) {
+  transform: rotateY(-15deg) scale(0.9) translateZ(-50px);
+  transform-origin: left center;
+  border-radius: 5px 20px 20px 5px;
+}
+.curved-showcase-item:hover {
+  transform: scale(1.08) translateZ(30px);
+  z-index: 10;
+}
+.curved-showcase-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .curved-showcase {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    perspective: none;
+  }
+  .curved-showcase-item,
+  .curved-showcase-item:nth-child(1),
+  .curved-showcase-item:nth-child(2),
+  .curved-showcase-item:nth-child(3) {
+    transform: none !important;
+    height: 250px;
+    border-radius: var(--radius-lg);
+  }
+}
 `;

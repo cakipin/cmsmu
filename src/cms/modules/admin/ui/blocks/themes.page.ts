@@ -11,7 +11,15 @@ export const themesPage = `
             theme_accent: '#f0f7ff',
             header_logo_url: '',
             header_menu_position: 'right',
-            header_text_color: '#334155'
+            header_text_color: '#334155',
+            sidebar_popular_limit: 5,
+            landing_title: '',
+            landing_subtitle: '',
+            landing_cta_text: 'Mulai Sekarang',
+            landing_cta_link: '/admin',
+            landing_image_1: '',
+            landing_image_2: '',
+            landing_image_3: ''
         },
 
         async openThemeEditor() {
@@ -30,6 +38,15 @@ export const themesPage = `
                     if (d.header_logo_url)    this.themeColors.header_logo_url    = d.header_logo_url;
                     if (d.header_menu_position) this.themeColors.header_menu_position = d.header_menu_position;
                     if (d.header_text_color)  this.themeColors.header_text_color  = d.header_text_color;
+                    if (d.sidebar_popular_limit) this.themeColors.sidebar_popular_limit = parseInt(d.sidebar_popular_limit) || 5;
+                    
+                    if (d.landing_title) this.themeColors.landing_title = d.landing_title;
+                    if (d.landing_subtitle) this.themeColors.landing_subtitle = d.landing_subtitle;
+                    if (d.landing_cta_text) this.themeColors.landing_cta_text = d.landing_cta_text;
+                    if (d.landing_cta_link) this.themeColors.landing_cta_link = d.landing_cta_link;
+                    if (d.landing_image_1) this.themeColors.landing_image_1 = d.landing_image_1;
+                    if (d.landing_image_2) this.themeColors.landing_image_2 = d.landing_image_2;
+                    if (d.landing_image_3) this.themeColors.landing_image_3 = d.landing_image_3;
                 }
             } catch(e) {}
             this.themeEditorOpen = true;
@@ -63,7 +80,15 @@ export const themesPage = `
                 theme_accent: '#f0f7ff',
                 header_logo_url: '',
                 header_menu_position: 'right',
-                header_text_color: '#334155'
+                header_text_color: '#334155',
+                sidebar_popular_limit: 5,
+                landing_title: '',
+                landing_subtitle: '',
+                landing_cta_text: 'Mulai Sekarang',
+                landing_cta_link: '/admin',
+                landing_image_1: '',
+                landing_image_2: '',
+                landing_image_3: ''
             };
         }
      }">
@@ -154,6 +179,14 @@ export const themesPage = `
               </div>
             </div>
 
+            <h4 style="margin:10px 0 4px; font-size:14px; color:#374151; border-bottom:1px solid #e5e7eb; padding-bottom:8px;">Widget Sidebar</h4>
+            <div>
+              <label style="display:block; font-size:12px; font-weight:600; color:#4b5563; margin-bottom:6px;">Jumlah Artikel Terpopuler</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input type="number" x-model="themeColors.sidebar_popular_limit" min="1" max="20" style="flex:1; padding:7px; border:1px solid #d1d5db; border-radius:5px; font-size:12px;">
+              </div>
+            </div>
+
             <h4 style="margin:10px 0 4px; font-size:14px; color:#374151; border-bottom:1px solid #e5e7eb; padding-bottom:8px;">Warna Tema</h4>
 
             <div>
@@ -197,6 +230,7 @@ export const themesPage = `
               </div>
               <p style="font-size:11px; color:#9ca3af; margin-top:3px;">Badge, blockquote, hover menu.</p>
             </div>
+
 
             <button @click="resetThemeColors()" style="margin-top:4px; padding:8px; background:#f3f4f6; border:1px solid #d1d5db; border-radius:6px; font-size:12px; cursor:pointer; color:#374151; text-align:center;">
                 ↺ Reset ke Setelan Awal

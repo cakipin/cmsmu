@@ -17,6 +17,7 @@ import { updateSchema } from './db/init'
 import { renderAdmin } from './modules/admin/ui/view'
 import postsRouter from './modules/posts/posts.router'
 import pagesRouter from './modules/pages/pages.router'; // Pastikan import ini ada
+import themeEditorRouter from './modules/theme-editor/editor.router'; // Route Puck Theme Editor
 
 
 // ADDONS
@@ -43,7 +44,7 @@ app.use('*', async (c, next) => {
   await next();
   c.header('X-Frame-Options', 'SAMEORIGIN');
   c.header('X-Content-Type-Options', 'nosniff');
-  c.header('Content-Security-Policy', "default-src 'self' https: data: blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' data: https: blob:; connect-src 'self' https:;");
+  c.header('Content-Security-Policy', "default-src 'self' https: data: blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' data: https: blob:; connect-src 'self' https:;");
 });
 
 app.onError((err, c) => {
@@ -85,6 +86,7 @@ app.route('/api/users', usersRouter);
 app.route('/api/menus', menusRouter);
 app.route('/api/posts', postsRouter);
 app.route('/api/pages', pagesRouter); // Route API Pages
+app.route('/api/theme-editor', themeEditorRouter); // Endpoint Editor Puck
 
 // Catch-all admin view (setelah spesifik routes)
 app.get('/admin/:view', (c) => c.html(renderAdmin({ view: c.req.param('view') })));

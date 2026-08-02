@@ -128,6 +128,51 @@ publicRouter.get('/search', async (c) => {
     } catch (e: any) { return c.text("Search Error: " + e.message, 500); }
 });
 
+// 2.5 ROUTE /INFO (SEMUA ARTIKEL DENGAN PAGINATION)
+publicRouter.get('/info', async (c) => {
+    const page = parseInt(c.req.query('page') || '1');
+    const limit = 12; // Batasi jumlah artikel 12
+    const offset = (page - 1) * limit;
+
+    try {
+        const db = c.env.DB;
+        const { settings, menus } = await getGlobalData(db);
+        const { Renderer } = await getRenderer(db);
+
+        // A. HITUNG TOTAL DATA
+        const countSql = `SELECT count(*) as total FROM posts WHERE status = 'publish'`;
+        const totalRow: any = await db.prepare(countSql).first();
+        const totalItems = totalRow.total || 0;
+        const totalPages = Math.ceil(totalItems / limit);
+
+        // B. AMBIL DATA
+        const sql = `SELECT * FROM posts WHERE status = 'publish' ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+        const { results: posts } = await db.prepare(sql).bind(limit, offset).all();
+
+        // C. KIRIM DATA KE TEMA
+        const context: any = { 
+            site: settings, 
+            menus: menus, 
+            data: posts || [],
+            categoryName: 'Informasi & Artikel',
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: totalItems,
+                hasNext: page < totalPages,
+                hasPrev: page > 1,
+                baseUrl: '/info'
+            }
+        };
+
+        if (Renderer && typeof Renderer.renderCategory === 'function') {
+            return c.html(Renderer.renderCategory(context));
+        }
+        return c.html(Renderer.renderHome(context));
+    } catch (e: any) { return c.text("Info Error: " + e.message, 500); }
+});
+
+
 // ============================================================
 // 3. ROUTE MAGIC (Kategori, Post, Page, Quran)
 // ============================================================
