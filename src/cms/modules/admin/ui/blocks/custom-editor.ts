@@ -31,6 +31,7 @@ export const customEditorTemplate = `
         <button @click="execCmd('justifyLeft')" class="editor-btn" :class="{'active': activeFormats.alignLeft}" title="Align Left"><i class="fas fa-align-left"></i></button>
         <button @click="execCmd('justifyCenter')" class="editor-btn" :class="{'active': activeFormats.alignCenter}" title="Align Center"><i class="fas fa-align-center"></i></button>
         <button @click="execCmd('justifyRight')" class="editor-btn" :class="{'active': activeFormats.alignRight}" title="Align Right"><i class="fas fa-align-right"></i></button>
+        <button @click="execCmd('justifyFull')" class="editor-btn" :class="{'active': activeFormats.alignJustify}" title="Justify"><i class="fas fa-align-justify"></i></button>
 
         <div class="toolbar-divider" style="width: 1px; background: #c3c4c7; margin: 0 4px;"></div>
         
@@ -117,7 +118,7 @@ function customEditorLogic() {
     return {
         activeFormats: { 
             bold: false, italic: false, underline: false, strikeThrough: false,
-            ul: false, ol: false, alignLeft: false, alignCenter: false, alignRight: false 
+            ul: false, ol: false, alignLeft: false, alignCenter: false, alignRight: false, alignJustify: false 
         },
         savedSelection: null,
         linkModalOpen: false,
@@ -241,7 +242,8 @@ function customEditorLogic() {
                 ol: document.queryCommandState('insertOrderedList'),
                 alignLeft: document.queryCommandState('justifyLeft'),
                 alignCenter: document.queryCommandState('justifyCenter'),
-                alignRight: document.queryCommandState('justifyRight')
+                alignRight: document.queryCommandState('justifyRight'),
+                alignJustify: document.queryCommandState('justifyFull')
             };
         },
         
