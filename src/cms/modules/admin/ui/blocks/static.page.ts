@@ -83,7 +83,7 @@ export const staticPage = `
          },
 
          async deleteSinglePage(p) {
-             if (!confirm('Hapus halaman "' + p.title + '"?')) return;
+             if (!confirm('Hapus halaman ' + p.title + '?')) return;
              const token = localStorage.getItem('labmu_token');
              try {
                  const res = await fetch('/api/pages', { 
