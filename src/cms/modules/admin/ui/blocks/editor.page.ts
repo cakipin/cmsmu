@@ -2,6 +2,7 @@ import { customEditorTemplate } from './custom-editor.ts';
 
 export const editorPage = `
 <div x-show="view === 'add' || view === 'edit'" class="animate-fade"
+     @open-editor-media.window="openMediaForEditor()"
      style="padding-bottom:80px; position:relative;"
      x-data="{
          // ===============================================

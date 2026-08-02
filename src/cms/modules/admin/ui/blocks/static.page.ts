@@ -2,6 +2,7 @@ import { customEditorTemplate } from './custom-editor.ts';
 
 export const staticPage = `
 <div x-show="view === 'pages' || view === 'add-page'" class="animate-fade" 
+     @open-editor-media.window="openMediaForEditor()"
      style="height: calc(100vh - 100px); background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; display: flex; flex-direction:column;"
      x-data="{
          // --- CORE STATE ---
@@ -80,6 +81,24 @@ export const staticPage = `
              this.selectedItems = [];
              await this.loadPages();
          },
+
+         async deleteSinglePage(p) {
+             if (!confirm('Hapus halaman "' + p.title + '"?')) return;
+             const token = localStorage.getItem('labmu_token');
+             try {
+                 const res = await fetch('/api/pages', { 
+                     method: 'DELETE', 
+                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                     body: JSON.stringify({ id: p.id })
+                 });
+                 if (res.ok) {
+                     await this.loadPages();
+                 } else {
+                     alert('Gagal menghapus halaman.');
+                 }
+             } catch(e) { console.error(e); }
+         },
+
 
          // ============================================================
          // 2. EDITOR LOGIC
@@ -274,8 +293,9 @@ export const staticPage = `
                             <td style="padding:15px 20px; text-align:center;" x-text="formatDate(p.created_at)"></td>
                             <td style="padding:15px 20px; text-align:right;">
                                 <div style="display:flex; justify-content:flex-end; gap:8px;">
-                                    <button @click="previewPage(p.slug)" style="color:#059669; border:1px solid #d1fae5; background:#ecfdf5; padding:6px 10px; border-radius:4px; cursor:pointer;"><i class="fas fa-eye"></i></button>
-                                    <button @click="editPage(p)" style="color:#2563eb; border:1px solid #dbeafe; background:#eff6ff; padding:6px 10px; border-radius:4px; cursor:pointer;"><i class="fas fa-pencil-alt"></i> Edit</button>
+                                    <button @click="previewPage(p.slug)" title="Lihat" style="color:#059669; border:1px solid #d1fae5; background:#ecfdf5; padding:6px 10px; border-radius:4px; cursor:pointer;"><i class="fas fa-eye"></i></button>
+                                    <button @click="editPage(p)" title="Edit" style="color:#2563eb; border:1px solid #dbeafe; background:#eff6ff; padding:6px 10px; border-radius:4px; cursor:pointer;"><i class="fas fa-pencil-alt"></i> Edit</button>
+                                    <button @click="deleteSinglePage(p)" title="Hapus" style="color:#dc2626; border:1px solid #fee2e2; background:#fef2f2; padding:6px 10px; border-radius:4px; cursor:pointer;"><i class="fas fa-trash"></i></button>
                                 </div>
                             </td>
                         </tr>
