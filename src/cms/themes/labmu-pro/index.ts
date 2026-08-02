@@ -195,6 +195,56 @@ const LabMuPro: ThemeStructure = {
       dynamicPostsHtml = '<p class="text-slate-500 col-span-3 text-center">Belum ada artikel yang diterbitkan.</p>';
     }
 
+    // Parse Puck Data
+    let puckData: any = { content: [] };
+    if (ctx.pageData && ctx.pageData.content) {
+      try {
+        puckData = JSON.parse(ctx.pageData.content);
+      } catch (e) {}
+    }
+
+    const getBlockProps = (type: string, defaultProps: any) => {
+      const block = puckData.content.find((b: any) => b.type === type);
+      return block && block.props ? { ...defaultProps, ...block.props } : defaultProps;
+    };
+
+    const heroProps = getBlockProps('Hero', {
+      title: 'Bangun Bisnis Kreatif Anda <br class="hidden md:block">Menuju Ekosistem <span class="text-green-600">Berkemajuan</span>',
+      description: 'Lembaga Ekonomi Kreatif Muhammadiyah hadir untuk mendampingi pelaku UMKM, kreator, dan inovator digital dengan pendekatan syariah, teknologi modern, dan jaringan global.',
+      buttonText: 'Daftar Inkubasi Sekarang',
+      buttonLink: '#gabung',
+      backgroundImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop'
+    });
+    
+    // Also check if they used HeroSlider
+    const heroSliderProps = getBlockProps('HeroSlider', heroProps);
+    // Prefer HeroSlider if it has a custom title (i.e. not equal to the default fallback)
+    const finalHeroProps = (heroSliderProps.title !== heroProps.title && puckData.content.find((b: any) => b.type === 'HeroSlider')) 
+        ? heroSliderProps 
+        : heroProps;
+
+    const featureGridProps = getBlockProps('FeatureGrid', {
+      title: 'Mengapa Bergabung Bersama Kami?',
+      description: 'Kami memadukan prinsip ekonomi Islam dengan literasi digital untuk memastikan bisnis Anda tumbuh secara etis dan eksponensial.',
+      features: [
+        {
+          title: 'Akselerasi Digital',
+          description: 'Pendampingan integrasi sistem, dari pengelolaan server awan, otomasi database, hingga optimasi antarmuka digital UMKM.',
+          icon: '<svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>'
+        },
+        {
+          title: 'Jaringan Saudagar',
+          description: 'Akses eksklusif ke ribuan pelaku usaha dalam ekosistem persyarikatan untuk kolaborasi silang dan rantai pasok.',
+          icon: '<svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>'
+        },
+        {
+          title: 'Kemandirian Finansial',
+          description: 'Pendanaan syariah berbasis kemitraan strategis dari ekosistem BTM dan lembaga filantropi Muhammadiyah.',
+          icon: '<svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+        }
+      ]
+    });
+
     const html = `
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -234,7 +284,7 @@ const LabMuPro: ThemeStructure = {
         <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
             <!-- Background Image & Overlay -->
             <div class="absolute inset-0 z-0">
-                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop" alt="Ekosistem Digital EkrafMu" class="w-full h-full object-cover object-center">
+                <img src="${finalHeroProps.backgroundImage}" alt="Ekosistem Digital EkrafMu" class="w-full h-full object-cover object-center">
                 <div class="absolute inset-0 bg-white/50 backdrop-blur-sm"></div>
                 <div class="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-slate-50"></div>
             </div>
@@ -243,15 +293,14 @@ const LabMuPro: ThemeStructure = {
                     🚀 Mendorong Kemandirian Umat
                 </div>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight mb-6 leading-tight">
-                    Bangun Bisnis Kreatif Anda <br class="hidden md:block">
-                    Menuju Ekosistem <span class="text-green-600">Berkemajuan</span>
+                    ${finalHeroProps.title}
                 </h1>
                 <p class="mt-4 text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-10">
-                    Lembaga Ekonomi Kreatif Muhammadiyah hadir untuk mendampingi pelaku UMKM, kreator, dan inovator digital dengan pendekatan syariah, teknologi modern, dan jaringan global.
+                    ${finalHeroProps.description}
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="#gabung" class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition shadow-xl shadow-green-600/30 flex items-center justify-center gap-2">
-                        Daftar Inkubasi Sekarang
+                    <a href="${finalHeroProps.buttonLink}" class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition shadow-xl shadow-green-600/30 flex items-center justify-center gap-2">
+                        ${finalHeroProps.buttonText}
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                     </a>
                     <a href="#berita" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-8 py-4 rounded-full font-bold text-lg transition flex items-center justify-center">
@@ -276,35 +325,20 @@ const LabMuPro: ThemeStructure = {
         <section id="manfaat" class="py-20 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Mengapa Bergabung Bersama Kami?</h2>
-                    <p class="text-slate-600 text-lg">Kami memadukan prinsip ekonomi Islam dengan literasi digital untuk memastikan bisnis Anda tumbuh secara etis dan eksponensial.</p>
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">${featureGridProps.title}</h2>
+                    <p class="text-slate-600 text-lg">${featureGridProps.description}</p>
                 </div>
                 
                 <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Feature 1 -->
+                    ${featureGridProps.features.map((f: any) => `
                     <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-green-500 hover:shadow-lg transition-all duration-300 group">
                         <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            ${f.icon}
                         </div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-3">Akselerasi Digital</h3>
-                        <p class="text-slate-600 leading-relaxed">Pendampingan integrasi sistem, dari pengelolaan server awan, otomasi database, hingga optimasi antarmuka digital UMKM.</p>
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">${f.title}</h3>
+                        <p class="text-slate-600 leading-relaxed">${f.description}</p>
                     </div>
-                    <!-- Feature 2 -->
-                    <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-green-500 hover:shadow-lg transition-all duration-300 group">
-                        <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-3">Jaringan Saudagar</h3>
-                        <p class="text-slate-600 leading-relaxed">Akses eksklusif ke ribuan pelaku usaha dalam ekosistem persyarikatan untuk kolaborasi silang dan rantai pasok.</p>
-                    </div>
-                    <!-- Feature 3 -->
-                    <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-green-500 hover:shadow-lg transition-all duration-300 group">
-                        <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-3">Pendampingan Syariah</h3>
-                        <p class="text-slate-600 leading-relaxed">Memastikan model bisnis, pendanaan, dan operasional Anda sesuai dengan prinsip ekonomi Islam yang amanah.</p>
-                    </div>
+                    `).join('')}
                 </div>
             </div>
         </section>

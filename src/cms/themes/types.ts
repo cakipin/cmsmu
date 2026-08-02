@@ -3,10 +3,13 @@ export interface ThemeContext {
     title: string;
     description: string;
     url: string;
+    [key: string]: any;
   };
+  menus?: any;
   themeConfig?: any;    // Konfigurasi custom tema (contoh: header, footer, warna)
   data?: any;           // Data Utama (Bisa Single Post atau List Post)
   sidebarPosts?: any[]; // <--- TAMBAHAN: Data Khusus Sidebar
+  pageData?: any;       // Data dari halaman kustom (misalnya halaman 'home')
 }
 
 export interface ThemeStructure {
