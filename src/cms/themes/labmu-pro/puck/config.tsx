@@ -1,40 +1,135 @@
 import React from "react";
 import type { Config } from "@puckeditor/core";
 
-// Komponen-komponen Dasar yang akan dipakai oleh Puck
+const ImageField = ({ value, onChange, name }: any) => {
+  const [isUploading, setIsUploading] = React.useState(false);
 
-export type Props = {
-  Hero: {
-    title: string;
-    description: string;
-    backgroundImage: string;
-    buttonText: string;
-    buttonLink: string;
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('labmu_token') || '' : '';
+      const res = await fetch('/api/media', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      const data = await res.json();
+      if (data.url) {
+        onChange(data.url);
+      } else {
+        alert("Upload gagal: " + (data.error || "Unknown error"));
+      }
+    } catch (err: any) {
+      alert("Error upload: " + err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ display: 'block', fontSize: 13, fontWeight: 'bold', marginBottom: 8, color: '#374151', textTransform: 'capitalize' }}>
+        {name ? name.replace(/([A-Z])/g, ' $1').trim() : 'Image Upload'}
+      </label>
+      {value && <img src={value} alt="Preview" style={{ width: '100%', height: 'auto', marginBottom: 8, borderRadius: 4, border: '1px solid #e5e7eb' }} />}
+      <input 
+        type="file" 
+        accept="image/*" 
+        onChange={handleUpload} 
+        disabled={isUploading}
+        style={{ width: '100%', fontSize: 13, display: 'block', marginBottom: 8 }}
+      />
+      {isUploading && <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>Mengunggah...</div>}
+      <input 
+        type="text" 
+        value={value || ''} 
+        onChange={(e) => onChange(e.target.value)} 
+        placeholder="Atau masukkan URL gambar"
+        style={{ width: '100%', padding: '6px 8px', fontSize: 13, border: '1px solid #d1d5db', borderRadius: 4, boxSizing: 'border-box' }}
+      />
+    </div>
+  );
+};
+
+type Props = {
+  SiteHeader: {
+    logoImage: string;
+    siteTitle: string;
+    siteTitleHighlight: string;
+    logoLetter: string;
+    menuItems: { label: string; url: string }[];
+    ctaText: string;
+    ctaUrl: string;
+    headerBgColor1: string;
+    headerBgColor2: string;
+    textColor: string;
+    fontFamily: string;
+    menuPosition: string;
+    headerPadding: string;
   };
   HeroSlider: {
     slides: { image: string; title: string; subtitle: string; buttonText: string; buttonLink: string }[];
+    sliderHeight: string;
+    textPosition: string;
+    overlayOpacity: number;
+    titleColor: string;
+    titleSize: string;
+  };
+  Hero: {
+    badgeText: string;
+    title: string;
+    titleHighlight: string;
+    titleColor: string;
+    description: string;
+    descriptionColor: string;
+    primaryButtonText: string;
+    primaryButtonLink: string;
+    secondaryButtonText: string;
+    secondaryButtonLink: string;
+    backgroundImage: string;
+    backgroundColor: string;
+  };
+  Partners: {
+    title: string;
+    partners: { name: string; logoUrl?: string }[];
   };
   FeatureGrid: {
     title: string;
-    features: { title: string; description: string; icon: string }[];
+    description: string;
+    features: { title: string; description: string; svgIcon: string }[];
   };
   Testimonial: {
     title: string;
-    testimonials: { name: string; role: string; content: string; avatar: string }[];
+    subtitle: string;
+    testimonials: { quote: string; author: string; role: string; initials: string; bgColor: string }[];
   };
-  ContactForm: {
-    heading: string;
-    emailTo: string;
+  RecentPosts: {
+    title: string;
+    description: string;
+    viewAllText: string;
+    viewAllLink: string;
   };
-  RichText: {
-    content: string;
+  CallToAction: {
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonLink: string;
+    footerText: string;
+  };
+  SiteFooter: {
+    siteName: string;
+    copyrightText: string;
   };
   CustomHTML: {
     html: string;
-  };
-  GoogleMap: {
-    iframeUrl: string;
-    height: number;
   };
   Spacer: {
     height: number;
@@ -43,228 +138,369 @@ export type Props = {
 
 export const puckConfig: Config<Props> = {
   components: {
-    Hero: {
+    SiteHeader: {
       fields: {
-        title: { type: "text" },
-        description: { type: "textarea" },
-        backgroundImage: { type: "text" },
-        buttonText: { type: "text" },
-        buttonLink: { type: "text" },
+        siteTitle: { type: "text" },
+        siteTitleHighlight: { type: "text" },
+        logoLetter: { type: "text" },
+        logoImage: { type: "custom", render: ImageField },
+        menuItems: {
+          type: "array",
+          arrayFields: {
+            label: { type: "text" },
+            url: { type: "text" }
+          }
+        },
+        ctaText: { type: "text" },
+        ctaUrl: { type: "text" },
+        headerBgColor1: { type: "text" },
+        headerBgColor2: { type: "text" },
+        textColor: { type: "text" },
+        fontFamily: { type: "select", options: [{label: "Sans (Default)", value: "sans-serif"}, {label: "Serif", value: "serif"}, {label: "Mono", value: "monospace"}] },
+        menuPosition: { type: "radio", options: [{label: "Kiri", value: "start"}, {label: "Tengah", value: "center"}, {label: "Kanan", value: "end"}] },
+        headerPadding: { type: "select", options: [{label: "Normal", value: "h-20"}, {label: "Kecil", value: "h-16"}, {label: "Besar", value: "h-24"}] }
       },
       defaultProps: {
-        title: "Selamat Datang di Halaman Baru",
-        description: "Tambahkan deskripsi halaman Anda di sini.",
-        backgroundImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop",
-        buttonText: "Hubungi Kami",
-        buttonLink: "/kontak",
+        siteTitle: "Ekraf",
+        siteTitleHighlight: "Mu",
+        logoLetter: "M",
+        logoImage: "",
+        menuItems: [
+          { label: "Keunggulan", url: "#manfaat" },
+          { label: "Kisah Sukses", url: "#testimoni" },
+          { label: "Berita & Artikel", url: "#berita" },
+          { label: "Daftar Inkubasi", url: "#gabung" }
+        ],
+        ctaText: "Mulai Bergabung",
+        ctaUrl: "#gabung",
+        headerBgColor1: "#ffffff",
+        headerBgColor2: "#ffffff",
+        textColor: "#1e293b",
+        fontFamily: "sans-serif",
+        menuPosition: "center",
+        headerPadding: "h-20"
       },
-      render: ({ title, description, backgroundImage, buttonText, buttonLink }) => (
-        <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden text-center">
-          <div className="absolute inset-0 z-0">
-            <img src={backgroundImage} alt={title} className="w-full h-full object-cover object-center" />
-            <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px]"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-slate-50"></div>
+      render: ({ siteTitle, siteTitleHighlight, logoLetter, logoImage, menuItems, ctaText, ctaUrl, headerBgColor1, headerBgColor2, textColor, fontFamily, menuPosition, headerPadding }) => (
+        <nav id="navbar" className={`fixed w-full z-50 transition-all duration-300 backdrop-blur-md border-b border-gray-100`} style={{ background: `linear-gradient(90deg, ${headerBgColor1}, ${headerBgColor2})`, color: textColor, fontFamily: fontFamily }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className={`flex justify-between items-center ${headerPadding}`}>
+              <div className="flex-shrink-0 flex items-center gap-2">
+                <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-xl">{logoLetter}</div>
+                <span className="font-bold text-xl" style={{ color: textColor }}>{siteTitle}<span className="text-green-600 ml-1">{siteTitleHighlight}</span></span>
+              </div>
+              <div className={`hidden md:flex space-x-6 lg:space-x-8 flex-1 mx-8 justify-${menuPosition}`}>
+                {menuItems.map((item, i) => (
+                  <a key={i} href={item.url} className="hover:text-green-600 font-medium transition" style={{ color: textColor }}>
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+              <div className="hidden md:flex">
+                <a href={ctaUrl} className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-full font-semibold transition shadow-lg shadow-green-600/30">
+                  {ctaText}
+                </a>
+              </div>
+            </div>
           </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight mb-6 leading-tight">
-              {title}
-            </h1>
-            <p className="mt-4 text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-10">
-              {description}
-            </p>
-            {buttonText && (
-              <a href={buttonLink} className="inline-flex bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition shadow-xl shadow-green-600/30 items-center justify-center">
-                {buttonText}
-              </a>
-            )}
-          </div>
-        </section>
-      ),
+        </nav>
+      )
     },
-    FeatureGrid: {
+
+    HeroSlider: {
       fields: {
-        title: { type: "text" },
-        features: {
+        sliderHeight: { type: "select", options: [{label: "Medium (600px)", value: "h-[600px]"}, {label: "Large (800px)", value: "h-[800px]"}, {label: "Full Screen", value: "h-screen"}] },
+        textPosition: { type: "radio", options: [{label: "Kiri", value: "items-start text-left"}, {label: "Tengah", value: "items-center text-center"}, {label: "Kanan", value: "items-end text-right"}] },
+        overlayOpacity: { type: "number" },
+        titleColor: { type: "text" },
+        titleSize: { type: "select", options: [{label: "Normal", value: "text-4xl md:text-6xl"}, {label: "Besar", value: "text-5xl md:text-7xl"}] },
+        slides: {
           type: "array",
           arrayFields: {
             title: { type: "text" },
-            description: { type: "textarea" },
-            icon: { type: "text" },
-          },
-        },
+            subtitle: { type: "textarea" },
+            image: { type: "custom", render: ImageField },
+            buttonText: { type: "text" },
+            buttonLink: { type: "text" }
+          }
+        }
       },
       defaultProps: {
-        title: "Layanan Kami",
-        features: [
-          { title: "Inovasi", description: "Deskripsi inovasi", icon: "🚀" },
-          { title: "Kolaborasi", description: "Deskripsi kolaborasi", icon: "🤝" },
-        ],
+        sliderHeight: "h-[600px]",
+        textPosition: "items-center text-center",
+        overlayOpacity: 50,
+        titleColor: "#ffffff",
+        titleSize: "text-4xl md:text-6xl",
+        slides: [
+          {
+            title: "Solusi Ekonomi Digital",
+            subtitle: "Memberdayakan UMKM melalui teknologi yang amanah dan transparan.",
+            image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=2000",
+            buttonText: "Pelajari Lebih Lanjut",
+            buttonLink: "#"
+          }
+        ]
       },
-      render: ({ title, features }) => (
-        <section className="py-16 bg-slate-50">
+      render: ({ slides, sliderHeight, textPosition, overlayOpacity, titleColor, titleSize }) => (
+        <section className={`relative w-full ${sliderHeight} overflow-hidden flex snap-x snap-mandatory overflow-x-auto`}>
+          {slides.map((slide, idx) => (
+            <div key={idx} className="relative w-full h-full flex-shrink-0 snap-center flex items-center justify-center">
+              <div className="absolute inset-0 z-0">
+                <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
+                <div className="absolute inset-0" style={{ backgroundColor: `rgba(0,0,0,${overlayOpacity / 100})` }}></div>
+              </div>
+              <div className={`relative z-10 px-8 max-w-7xl w-full flex flex-col ${textPosition}`}>
+                <h2 className={`${titleSize} font-bold mb-4`} style={{ color: titleColor }}>{slide.title}</h2>
+                <p className="text-xl text-slate-200 mb-8 max-w-2xl">{slide.subtitle}</p>
+                {slide.buttonText && (
+                  <a href={slide.buttonLink} className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition text-lg">
+                    {slide.buttonText}
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </section>
+      )
+    },
+    Hero: {
+      fields: {
+        badgeText: { type: "text" },
+        title: { type: "text" },
+        titleHighlight: { type: "text" },
+        titleColor: { type: "text" },
+        description: { type: "textarea" },
+        descriptionColor: { type: "text" },
+        primaryButtonText: { type: "text" },
+        primaryButtonLink: { type: "text" },
+        secondaryButtonText: { type: "text" },
+        secondaryButtonLink: { type: "text" },
+        backgroundImage: { type: "custom", render: ImageField },
+        backgroundColor: { type: "text" }
+      },
+      defaultProps: {
+        badgeText: "🚀 Mendorong Kemandirian Umat",
+        title: "Bangun Bisnis Kreatif Anda Menuju Ekosistem",
+        titleHighlight: "Berkemajuan",
+        titleColor: "text-slate-900",
+        description: "Lembaga Ekonomi Kreatif Muhammadiyah hadir untuk mendampingi pelaku UMKM, kreator, dan inovator digital dengan pendekatan syariah, teknologi modern, dan jaringan global.",
+        descriptionColor: "text-slate-600",
+        primaryButtonText: "Daftar Inkubasi Sekarang",
+        primaryButtonLink: "#gabung",
+        secondaryButtonText: "Baca Berita Terbaru",
+        secondaryButtonLink: "#berita",
+        backgroundImage: "",
+        backgroundColor: "bg-slate-50"
+      },
+      render: ({ badgeText, title, titleHighlight, titleColor, description, descriptionColor, primaryButtonText, primaryButtonLink, secondaryButtonText, secondaryButtonLink, backgroundImage, backgroundColor }) => (
+        <section className={`relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden ${backgroundColor || 'bg-slate-50'}`} style={{ 
+          backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'radial-gradient(#cbd5e1 1px, transparent 1px)', 
+          backgroundSize: backgroundImage ? 'cover' : '20px 20px',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}>
+          {backgroundImage && <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-0"></div>}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div className="inline-block mb-4 px-4 py-1.5 rounded-full bg-green-100 text-green-700 font-semibold text-sm border border-green-200">
+              {badgeText}
+            </div>
+            <h1 className={`text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight ${titleColor || 'text-slate-900'}`}>
+              {title.split(' Menuju Ekosistem')[0]} <br className="hidden md:block" />
+              Menuju Ekosistem <span className="text-green-600">{titleHighlight}</span>
+            </h1>
+            <p className={`mt-4 text-lg md:text-xl max-w-3xl mx-auto mb-10 ${descriptionColor || 'text-slate-600'}`}>
+              {description}
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <a href={primaryButtonLink} className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition shadow-xl shadow-green-600/30 flex items-center justify-center gap-2">
+                {primaryButtonText}
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+              </a>
+              <a href={secondaryButtonLink} className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-8 py-4 rounded-full font-bold text-lg transition flex items-center justify-center">
+                {secondaryButtonText}
+              </a>
+            </div>
+          </div>
+        </section>
+      )
+    },
+    Partners: {
+      fields: {
+        title: { type: "text" },
+        partners: {
+          type: "array",
+          arrayFields: {
+            name: { type: "text" },
+            logoUrl: { type: "custom", render: ImageField }
+          }
+        }
+      },
+      defaultProps: {
+        title: "Dipercaya & Berkolaborasi Dengan",
+        partners: [
+          { name: "SatuMu", logoUrl: "" },
+          { name: "Suara Muhammadiyah", logoUrl: "" },
+          { name: "BTM", logoUrl: "" },
+          { name: "Lazismu", logoUrl: "" }
+        ]
+      },
+      render: ({ title, partners }) => (
+        <section className="bg-white py-12 border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-slate-900 mb-12">{title}</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {features.map((item, i) => (
-                <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 transition-all hover:shadow-md">
-                  <div className="text-4xl mb-4">{item.icon}</div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-slate-600">{item.description}</p>
+            <p className="text-sm text-slate-500 font-medium mb-8 uppercase tracking-wider">{title}</p>
+            <div className="flex justify-center flex-wrap gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition duration-300">
+              {partners.map((partner, i) => (
+                <div key={i} className="flex items-center justify-center">
+                  {partner.logoUrl ? (
+                    <img src={partner.logoUrl} alt={partner.name} className="h-10 object-contain" />
+                  ) : (
+                    <span className="text-2xl font-bold text-slate-800">{partner.name}</span>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </section>
-      ),
+      )
     },
-    ContactForm: {
-      fields: {
-        heading: { type: "text" },
-        emailTo: { type: "text" },
-      },
-      defaultProps: {
-        heading: "Hubungi Kami",
-        emailTo: "kontak@ekrafmu.id",
-      },
-      render: ({ heading, emailTo }) => (
-        <section className="py-16 bg-white">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">{heading}</h2>
-            <form className="space-y-6" action={`mailto:${emailTo}`} method="GET">
-              <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">Nama Depan</label>
-                  <div className="mt-1">
-                    <input type="text" className="py-3 px-4 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 border-slate-300 rounded-md border" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">Nama Belakang</label>
-                  <div className="mt-1">
-                    <input type="text" className="py-3 px-4 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 border-slate-300 rounded-md border" />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Email</label>
-                <div className="mt-1">
-                  <input type="email" className="py-3 px-4 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 border-slate-300 rounded-md border" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700">Pesan</label>
-                <div className="mt-1">
-                  <textarea rows={4} className="py-3 px-4 block w-full shadow-sm focus:ring-green-500 focus:border-green-500 border border-slate-300 rounded-md"></textarea>
-                </div>
-              </div>
-              <div>
-                <button type="submit" className="w-full inline-flex justify-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                  Kirim Pesan
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
-      ),
-    },
-    RichText: {
-      fields: {
-        content: { type: "textarea" },
-      },
-      defaultProps: {
-        content: "<h2>Judul Halaman</h2><p>Tulis teks lengkap Anda di sini. Mendukung tag HTML sederhana.</p>",
-      },
-      render: ({ content }) => (
-        <section className="py-12 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate prose-green lg:prose-lg" dangerouslySetInnerHTML={{ __html: content }} />
-        </section>
-      ),
-    },
-    HeroSlider: {
-      fields: {
-        slides: {
-          type: "array",
-          arrayFields: {
-            image: { type: "text" },
-            title: { type: "text" },
-            subtitle: { type: "textarea" },
-            buttonText: { type: "text" },
-            buttonLink: { type: "text" },
-          },
-        },
-      },
-      defaultProps: {
-        slides: [
-          {
-            image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070",
-            title: "Selamat Datang",
-            subtitle: "Kami siap membantu Anda",
-            buttonText: "Pelajari Lebih Lanjut",
-            buttonLink: "#",
-          }
-        ],
-      },
-      render: ({ slides }) => (
-        <section className="relative w-full overflow-hidden bg-slate-900 group" style={{ minHeight: '60vh', maxHeight: '80vh' }}>
-          {slides.map((slide, i) => (
-            <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${i === 0 ? 'opacity-100 relative z-10' : 'opacity-0 z-0 hidden'}`}>
-              <img src={slide.image} alt={slide.title} className="w-full h-full object-cover opacity-60" />
-              <div className="absolute inset-0 bg-black/40"></div>
-              <div className="absolute inset-0 flex items-center justify-center text-center px-4">
-                <div className="max-w-4xl">
-                  <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">{slide.title}</h2>
-                  <p className="text-lg md:text-2xl text-slate-200 mb-8">{slide.subtitle}</p>
-                  {slide.buttonText && (
-                    <a href={slide.buttonLink} className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full transition shadow-lg">
-                      {slide.buttonText}
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-          {/* Note: In a real slider, you would include a client-side script to cycle through slides. For Puck SSR, we show the first slide. */}
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
-            {slides.map((_, i) => (
-              <div key={i} className={`w-3 h-3 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/50'}`}></div>
-            ))}
-          </div>
-        </section>
-      ),
-    },
-    Testimonial: {
+    FeatureGrid: {
       fields: {
         title: { type: "text" },
-        testimonials: {
+        description: { type: "textarea" },
+        features: {
           type: "array",
           arrayFields: {
-            name: { type: "text" },
-            role: { type: "text" },
-            content: { type: "textarea" },
-            avatar: { type: "text" },
+            title: { type: "text" },
+            description: { type: "textarea" },
+            svgIcon: { type: "textarea" }
           }
         }
       },
       defaultProps: {
-        title: "Apa Kata Mereka",
-        testimonials: [
-          { name: "Ahmad", role: "Pengusaha", content: "Layanan sangat memuaskan dan profesional.", avatar: "https://placehold.co/100x100?text=A" }
+        title: "Mengapa Bergabung Bersama Kami?",
+        description: "Kami memadukan prinsip ekonomi Islam dengan literasi digital untuk memastikan bisnis Anda tumbuh secara etis dan eksponensial.",
+        features: [
+          {
+            title: "Akselerasi Digital",
+            description: "Pendampingan integrasi sistem, dari pengelolaan server awan, otomasi database, hingga optimasi antarmuka digital UMKM.",
+            svgIcon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>'
+          },
+          {
+            title: "Jaringan Saudagar",
+            description: "Akses eksklusif ke ribuan pelaku usaha dalam ekosistem persyarikatan untuk kolaborasi silang dan rantai pasok.",
+            svgIcon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>'
+          },
+          {
+            title: "Pendampingan Syariah",
+            description: "Memastikan model bisnis, pendanaan, dan operasional Anda sesuai dengan prinsip ekonomi Islam yang amanah.",
+            svgIcon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>'
+          }
         ]
       },
-      render: ({ title, testimonials }) => (
-        <section className="py-16 bg-white">
+      render: ({ title, description, features }) => (
+        <section id="manfaat" className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">{title}</h2>
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{title}</h2>
+              <p className="text-slate-600 text-lg">{description}</p>
+            </div>
             <div className="grid md:grid-cols-3 gap-8">
-              {testimonials.map((t, i) => (
-                <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm relative">
-                  <div className="text-green-500 text-4xl absolute top-4 right-6 opacity-20">"</div>
-                  <p className="text-slate-600 italic mb-6 relative z-10">"{t.content}"</p>
+              {features.map((feature, i) => (
+                <div key={i} className="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-xl hover:border-green-100 transition-all duration-300 group">
+                  <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" dangerouslySetInnerHTML={{ __html: feature.svgIcon }}></svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
+                  <p className="text-slate-600 leading-relaxed">{feature.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    },
+    Testimonial: {
+      fields: {
+        title: { type: "text" },
+        subtitle: { type: "textarea" },
+        testimonials: {
+          type: "array",
+          arrayFields: {
+            quote: { type: "textarea" },
+            author: { type: "text" },
+            role: { type: "text" },
+            initials: { type: "text" },
+            bgColor: { type: "text" }
+          }
+        }
+      },
+      defaultProps: {
+        title: "Mereka yang Tumbuh Bersama Kami",
+        subtitle: "Bukti nyata dari pelaku ekonomi kreatif dan UMKM yang telah merasakan manfaat dari program inkubasi dan jaringan EkrafMu.",
+        testimonials: [
+          {
+            quote: "Sejak bergabung dengan EkrafMu, omset bisnis pakaian muslim kami meningkat 300%. Pendampingan digitalisasinya sangat aplikatif.",
+            author: "Hafiz Ahmad",
+            role: "Founder, HijrahWear",
+            initials: "HA",
+            bgColor: "bg-green-600"
+          },
+          {
+            quote: "Jaringan saudagar Muhammadiyah benar-benar membuka pintu. Kami mendapat pemasok bahan baku yang amanah dan kompetitif.",
+            author: "Siti Aminah",
+            role: "CEO, Kuliner Berkah",
+            initials: "SA",
+            bgColor: "bg-green-500"
+          },
+          {
+            quote: "Sistem kasir awan yang dikembangkan bersama tim IT EkrafMu menyelesaikan masalah pencatatan keuangan kami yang berantakan.",
+            author: "Budi Santoso",
+            role: "Owner, Kopi Nusantara",
+            initials: "BS",
+            bgColor: "bg-green-700"
+          }
+        ]
+      },
+      render: ({ title, subtitle, testimonials }) => (
+        <section id="testimoni" className="py-20 bg-slate-50 border-y border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-end mb-12">
+              <div className="max-w-2xl">
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{title}</h2>
+                <p className="text-slate-600 text-lg">{subtitle}</p>
+              </div>
+              <div className="hidden md:flex gap-4">
+                <button className="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-green-600 hover:border-green-600 transition">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <button className="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-green-600 hover:border-green-600 transition">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+              </div>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              {testimonials.map((testi, i) => (
+                <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition duration-300 relative">
+                  <div className="absolute top-8 right-8 text-slate-200">
+                    <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 32 32" aria-hidden="true">
+                      <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z"></path>
+                    </svg>
+                  </div>
+                  <div className="flex justify-center text-yellow-400 gap-1 mb-6">
+                    {[1,2,3,4,5].map(star => (
+                      <svg key={star} className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    ))}
+                  </div>
+                  <p className="text-slate-700 mb-8 italic z-10 relative leading-relaxed">
+                    "{testi.quote}"
+                  </p>
                   <div className="flex items-center gap-4">
-                    <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full object-cover" />
+                    <div className={`w-12 h-12 rounded-full ${testi.bgColor} flex items-center justify-center text-white font-bold`}>
+                      {testi.initials}
+                    </div>
                     <div>
-                      <h4 className="font-bold text-slate-900">{t.name}</h4>
-                      <p className="text-sm text-slate-500">{t.role}</p>
+                      <h4 className="font-bold text-slate-900">{testi.author}</h4>
+                      <p className="text-sm text-slate-500">{testi.role}</p>
                     </div>
                   </div>
                 </div>
@@ -272,6 +508,122 @@ export const puckConfig: Config<Props> = {
             </div>
           </div>
         </section>
+      )
+    },
+    RecentPosts: {
+      fields: {
+        title: { type: "text" },
+        description: { type: "textarea" },
+        viewAllText: { type: "text" },
+        viewAllLink: { type: "text" }
+      },
+      defaultProps: {
+        title: "Kabar & Wawasan Terbaru",
+        description: "Ikuti perkembangan terbaru, kisah inspiratif, dan wawasan seputar ekonomi kreatif di ekosistem digital.",
+        viewAllText: "Lihat Semua Artikel",
+        viewAllLink: "#"
+      },
+      render: ({ title, description, viewAllText, viewAllLink }) => (
+        <section id="berita" className="py-20 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+              <div className="max-w-2xl">
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{title}</h2>
+                <p className="text-slate-600 text-lg">{description}</p>
+              </div>
+              <div>
+                <a href={viewAllLink} className="text-green-600 font-semibold hover:text-green-700 flex items-center gap-2 transition-all">
+                  {viewAllText}
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+              </div>
+            </div>
+            
+            <div className="recent-posts-placeholder">
+              {/* Fallback layout for builder if recent posts script doesn't run */}
+              <div className="grid md:grid-cols-3 gap-8">
+                  <div className="bg-slate-100 animate-pulse h-80 rounded-2xl"></div>
+                  <div className="bg-slate-100 animate-pulse h-80 rounded-2xl hidden md:block"></div>
+                  <div className="bg-slate-100 animate-pulse h-80 rounded-2xl hidden md:block"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )
+    },
+    CallToAction: {
+      fields: {
+        title: { type: "text" },
+        description: { type: "textarea" },
+        buttonText: { type: "text" },
+        buttonLink: { type: "text" },
+        footerText: { type: "text" }
+      },
+      defaultProps: {
+        title: "Siap Mengelevasi Skala Bisnis Anda?",
+        description: "Bergabunglah dengan ratusan inovator lainnya. Pendaftaran batch inkubasi bulan ini segera ditutup.",
+        buttonText: "Kirim Profil Usaha",
+        buttonLink: "#",
+        footerText: "Data Anda aman dan dikelola secara rahasia."
+      },
+      render: ({ title, description, buttonText, buttonLink, footerText }) => (
+        <section id="gabung" className="py-20 bg-slate-900 text-center relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#10b981 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">{title}</h2>
+            <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
+              {description}
+            </p>
+            <div className="bg-white p-8 rounded-2xl max-w-2xl mx-auto shadow-2xl text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Nama Lengkap</label>
+                  <input type="text" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Cth: Ahmad Dahlan" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Nomor WhatsApp</label>
+                  <input type="text" className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="0812-xxxx-xxxx" />
+                </div>
+              </div>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-slate-700 mb-2">Sektor Usaha Kreatif</label>
+                <select className="w-full border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
+                  <option>Pengembangan Perangkat Lunak & IT</option>
+                  <option>Kuliner & FnB</option>
+                  <option>Fashion & Kriya</option>
+                  <option>Media & Desain</option>
+                </select>
+              </div>
+              <button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-green-600/30 text-lg">
+                {buttonText}
+              </button>
+              <p className="text-center text-sm text-slate-500 mt-4">{footerText}</p>
+            </div>
+          </div>
+        </section>
+      )
+    },
+    SiteFooter: {
+      fields: {
+        siteName: { type: "text" },
+        copyrightText: { type: "text" }
+      },
+      defaultProps: {
+        siteName: "EkrafMu",
+        copyrightText: "© 2026 Lembaga Ekonomi Kreatif Muhammadiyah. Hak Cipta Dilindungi."
+      },
+      render: ({ siteName, copyrightText }) => (
+        <footer className="bg-white border-t border-slate-200 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">M</div>
+              <span className="font-bold text-lg text-slate-900">{siteName}</span>
+            </div>
+            <p className="text-slate-500 text-sm">
+              {copyrightText}
+            </p>
+          </div>
+        </footer>
       )
     },
     CustomHTML: {
@@ -283,35 +635,6 @@ export const puckConfig: Config<Props> = {
       },
       render: ({ html }) => (
         <div dangerouslySetInnerHTML={{ __html: html }} />
-      )
-    },
-    GoogleMap: {
-      fields: {
-        iframeUrl: { type: "text" },
-        height: { type: "number" }
-      },
-      defaultProps: {
-        iframeUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126920.24058206412!2d106.7583637119043!3d-6.229746499878206!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f3e945e34b9d%3A0x100c5e82dd4b820!2sJakarta!5e0!3m2!1sen!2sid!4v1700000000000",
-        height: 400
-      },
-      render: ({ iframeUrl, height }) => (
-        <section className="w-full">
-          {iframeUrl.startsWith('<iframe') ? (
-            // Jika user memasukkan seluruh tag <iframe>
-            <div style={{ height: `${height}px`, width: '100%' }} dangerouslySetInnerHTML={{ __html: iframeUrl }} />
-          ) : (
-            // Jika user hanya memasukkan URL src
-            <iframe 
-              src={iframeUrl} 
-              width="100%" 
-              height={height} 
-              style={{ border: 0 }} 
-              allowFullScreen={true} 
-              loading="lazy" 
-              referrerPolicy="no-referrer-when-downgrade">
-            </iframe>
-          )}
-        </section>
       )
     },
     Spacer: {

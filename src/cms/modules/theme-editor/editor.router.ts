@@ -20,8 +20,13 @@ themeEditorRouter.get('/page', async (c) => {
         // Pre-fill default layout for the home page so they can edit it immediately
         const defaultHomePuck = {
           content: [
-            { type: "Hero", props: { id: "Hero-1", title: "Bangun Bisnis Kreatif Anda", description: "Lembaga Ekonomi Kreatif Muhammadiyah hadir untuk mendampingi pelaku UMKM, kreator, dan inovator digital.", buttonText: "Daftar Inkubasi", buttonLink: "#", backgroundImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070" } },
-            { type: "FeatureGrid", props: { id: "FeatureGrid-1", title: "Keunggulan", features: [{ title: "Inovasi", description: "Inovasi teknologi digital.", icon: "🚀" }, { title: "Kolaborasi", description: "Jaringan luas dan bersinergi.", icon: "🤝" }] } }
+            { type: "SiteHeader", props: { id: "SiteHeader-1" } },
+            { type: "Hero", props: { id: "Hero-1" } },
+            { type: "FeatureGrid", props: { id: "FeatureGrid-1" } },
+            { type: "Testimonial", props: { id: "Testimonial-1" } },
+            { type: "RecentPosts", props: { id: "RecentPosts-1" } },
+            { type: "CallToAction", props: { id: "CallToAction-1" } },
+            { type: "SiteFooter", props: { id: "SiteFooter-1" } }
           ],
           root: { props: { title: "Beranda Utama" } },
           zones: {}
@@ -39,7 +44,12 @@ themeEditorRouter.get('/page', async (c) => {
 themeEditorRouter.get('/pages', async (c) => {
   try {
     const { results } = await c.env.DB.prepare('SELECT id, title, slug FROM pages ORDER BY title ASC').all();
-    return c.json({ success: true, data: results || [] });
+    
+    // Get homepage slug from settings
+    const settingRow = await c.env.DB.prepare("SELECT value FROM settings WHERE key = 'site_homepage_slug'").first();
+    const homeSlug = settingRow ? settingRow.value : 'home';
+    
+    return c.json({ success: true, data: results || [], homeSlug: homeSlug });
   } catch (e: any) {
     return c.json({ error: e.message }, 500);
   }

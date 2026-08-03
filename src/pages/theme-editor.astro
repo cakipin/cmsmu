@@ -5,8 +5,10 @@ import ThemeEditorApp from "../components/ThemeEditorApp";
 // Kita tidak ingin halaman ini diserap oleh SSG, jadi matikan prerender jika diperlukan (tapi Astro default di sini mungkin SSR karena Hono)
 export const prerender = false;
 
+import "@/styles/global.css";
+
 // Ambil slug dari query params
-const slug = Astro.url.searchParams.get("slug") || "about";
+const slug = Astro.url.searchParams.get("slug") || "home";
 ---
 
 <!DOCTYPE html>

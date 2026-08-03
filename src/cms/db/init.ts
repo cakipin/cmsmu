@@ -84,6 +84,13 @@ export const updateSchema = async (db: D1Database) => {
     `).run();
     logs.push("✅ Table 'pages' checked (Safe).");
 
+    try {
+        await db.prepare("ALTER TABLE pages ADD COLUMN layout TEXT DEFAULT 'standard';").run();
+        logs.push("✅ Added 'layout' column to 'pages' table.");
+    } catch (e: any) {
+        // Kolom mungkin sudah ada
+    }
+
     // 3C. TABEL MEDIA_META
     await db.prepare(`
       CREATE TABLE IF NOT EXISTS media_meta (

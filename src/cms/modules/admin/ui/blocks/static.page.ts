@@ -12,7 +12,7 @@ export const staticPage = `
          isLoading: false,
          
          // --- EDITOR STATE ---
-         form: { title: '', slug: '', body: '', status: 'publish', featured_image: '' },
+         form: { title: '', slug: '', body: '', status: 'publish', featured_image: '', layout: 'standard' },
          isSaving: false,
          editorInstance: null,
 
@@ -112,7 +112,7 @@ export const staticPage = `
          },
 
          async initPageEditor() {
-             this.form = { title: '', slug: '', body: '', status: 'publish', featured_image: '' };
+             this.form = { title: '', slug: '', body: '', status: 'publish', featured_image: '', layout: 'standard' };
              
              if(window.editingPageId) {
                  await this.loadSinglePage(window.editingPageId);
@@ -338,9 +338,20 @@ export const staticPage = `
                             <option value="draft">Draft</option>
                         </select>
                     </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="font-size:12px; display:block; margin-bottom:5px;">Layout Halaman</label>
+                        <select x-model="form.layout" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                            <option value="standard">Standard Page (Dengan Sidebar & Menu)</option>
+                            <option value="landing">Landing Page (Penuh / Builder Custom)</option>
+                        </select>
+                    </div>
                     <button @click="savePage()" :disabled="isSaving" 
                             style="width:100%; padding:10px; background:#2563eb; color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer;"
                             x-text="isSaving ? 'Menyimpan...' : 'Simpan Halaman'">
+                    </button>
+                    <button @click="if(window.editingPageId) { window.open('/theme-editor?slug=' + form.slug, '_blank'); } else { alert('Silakan Simpan Halaman terlebih dahulu sebelum membuka Visual Editor.'); }" 
+                            style="width:100%; margin-top:10px; padding:10px; background:#10b981; color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer; display:flex; justify-content:center; align-items:center; gap:8px;">
+                        <i class="fas fa-magic"></i> Visual Editor Halaman
                     </button>
                 </div>
 

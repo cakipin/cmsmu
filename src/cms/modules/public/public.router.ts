@@ -47,7 +47,8 @@ publicRouter.get('/', async (c) => {
         const { results: posts } = await c.env.DB.prepare("SELECT * FROM posts WHERE status = 'publish' ORDER BY created_at DESC LIMIT 10").all();
         
         // Check if custom 'home' page exists for overriding texts
-        const customHome: any = await c.env.DB.prepare("SELECT * FROM pages WHERE slug = 'home'").first();
+        const homeSlug = settings.site_homepage_slug || 'home';
+        const customHome: any = await c.env.DB.prepare("SELECT * FROM pages WHERE slug = ?").bind(homeSlug).first();
         
         const context = { site: settings, menus: menus, data: posts || [], pageData: customHome || null };
         return c.html(Renderer.renderHome(context));

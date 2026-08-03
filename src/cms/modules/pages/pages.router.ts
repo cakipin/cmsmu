@@ -11,7 +11,7 @@ pagesRouter.get('/', async (c) => {
   try {
     // [UPDATE] Ambil featured_image juga jika nanti mau ditampilkan di tabel
     const { results } = await c.env.DB.prepare(
-      "SELECT id, title, slug, status, featured_image, created_at FROM pages ORDER BY created_at DESC"
+      "SELECT id, title, slug, status, featured_image, layout, created_at FROM pages ORDER BY created_at DESC"
     ).all();
     return c.json(results);
   } catch (e: any) {
@@ -35,12 +35,12 @@ pagesRouter.post('/', async (c) => {
   try {
     const body = await c.req.json();
     // [UPDATE] Ambil featured_image dari body
-    const { title, slug, body: content, excerpt, meta_title, meta_description, status, featured_image } = body;
+    const { title, slug, body: content, excerpt, meta_title, meta_description, status, featured_image, layout } = body;
     
     await c.env.DB.prepare(`
-      INSERT INTO pages (title, slug, body, excerpt, meta_title, meta_description, status, featured_image, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-    `).bind(title, slug, content, excerpt || '', meta_title || '', meta_description || '', status || 'publish', featured_image || '').run();
+      INSERT INTO pages (title, slug, body, excerpt, meta_title, meta_description, status, featured_image, layout, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+    `).bind(title, slug, content, excerpt || '', meta_title || '', meta_description || '', status || 'publish', featured_image || '', layout || 'standard').run();
     
     return c.json({ success: true });
   } catch (e: any) {
@@ -55,9 +55,9 @@ pagesRouter.put('/:id', async (c) => {
     const body = await c.req.json();
     // [UPDATE] Update featured_image
     await c.env.DB.prepare(`
-      UPDATE pages SET title=?, slug=?, body=?, excerpt=?, meta_title=?, meta_description=?, status=?, featured_image=?, updated_at=datetime('now')
+      UPDATE pages SET title=?, slug=?, body=?, excerpt=?, meta_title=?, meta_description=?, status=?, featured_image=?, layout=?, updated_at=datetime('now')
       WHERE id=?
-    `).bind(body.title, body.slug, body.body, body.excerpt || '', body.meta_title || '', body.meta_description || '', body.status, body.featured_image || '', id).run();
+    `).bind(body.title, body.slug, body.body, body.excerpt || '', body.meta_title || '', body.meta_description || '', body.status, body.featured_image || '', body.layout || 'standard', id).run();
     
     return c.json({ success: true });
   } catch (e: any) {

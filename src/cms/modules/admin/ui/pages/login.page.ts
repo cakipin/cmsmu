@@ -57,6 +57,31 @@ export const loginPage = `
                 this.isLoading = false;
             }
         }
+        async loginSso() {
+            this.isLoading = true;
+            try {
+                let clientId = 'client_svRBFbrf9AK7GMPAAOMZrXRa'; // Default fallback
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const json = await res.json();
+                    const data = json.data || json;
+                    if (data.sso_enabled === 'false') {
+                        alert('SSO sedang dinonaktifkan.');
+                        this.isLoading = false;
+                        return;
+                    }
+                    if (data.sso_client_id) {
+                        clientId = data.sso_client_id;
+                    }
+                }
+                const redirectUri = \`\${window.location.origin}/admin/sso/callback\`;
+                const authorizeUrl = \`https://dias.muhammadiyah.or.id/oauth/authorize?client_id=\${clientId}&redirect_uri=\${encodeURIComponent(redirectUri)}&response_type=code\`;
+                window.location.href = authorizeUrl;
+            } catch(e) {
+                alert('Gagal inisialisasi SSO');
+                this.isLoading = false;
+            }
+        }
      }">
 
     <div style="width: 100%; max-width: 400px; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
@@ -94,6 +119,18 @@ export const loginPage = `
                 <span x-text="isLoading ? 'Memproses...' : 'Masuk'"></span>
             </button>
         </form>
+
+        <div style="margin: 20px 0; text-align: center; position: relative;">
+            <hr style="border: 0; border-top: 1px solid #e2e8f0;">
+            <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 10px; color: #64748b; font-size: 13px;">atau</span>
+        </div>
+
+        <button type="button"
+                @click="loginSso()"
+                style="width:100%; padding:14px; background:#f8fafc; color:#0f172a; border:1px solid #cbd5e1; border-radius:8px; font-weight:600; cursor:pointer; font-size:15px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <img src="https://dias.muhammadiyah.or.id/logo.png" alt="Muhammadiyah ID" style="height: 20px;" onerror="this.style.display='none'">
+            Masuk dengan Muhammadiyah ID
+        </button>
     </div>
 </div>
 `;

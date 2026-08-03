@@ -11,6 +11,7 @@ import { themesPage } from './blocks/themes.page';
 import { pluginsPage } from './blocks/plugins.page';
 import { globalModals } from './blocks/modals';
 import { cmsLogic } from './blocks/cms.logic';
+import { ssoPage } from './blocks/sso.page';
 import { loginPage } from './pages/login.page'; 
 
 export function renderAdmin(data: any): string {
@@ -68,7 +69,8 @@ export function renderAdmin(data: any): string {
                     { group: 'Appearance', title: 'Theme Editor', href: '/theme-editor', icon: 'fas fa-laptop-code', role: ['admin'] },
                     { group: 'Appearance', title: 'Menus', view: 'menus', icon: 'fas fa-bars', role: ['admin', 'editor'] },
                     { group: 'System', title: 'Users', view: 'users', icon: 'fas fa-users', role: ['admin'], action: () => typeof loadUsers === 'function' && loadUsers() },
-                    { group: 'System', title: 'Settings', view: 'settings', icon: 'fas fa-cog', role: ['admin'] }
+                    { group: 'System', title: 'Settings', view: 'settings', icon: 'fas fa-cog', role: ['admin'] },
+                    { group: 'Plugins', title: 'SSO Setup', view: 'sso-setup', icon: 'fas fa-shield-alt', role: ['admin'] }
                 ];
 
                 /**
@@ -118,6 +120,7 @@ export function renderAdmin(data: any): string {
                             ${dashboardPage}
                             ${pagesBlock}
                             <template x-if="view === 'menus'"><div class="exclusive-wrapper">${menusPage}</div></template>
+                            ${ssoPage}
                             ${globalModals}
                         </main>
                     </div>

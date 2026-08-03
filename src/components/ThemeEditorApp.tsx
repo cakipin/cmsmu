@@ -3,21 +3,30 @@ import { Puck } from "@puckeditor/core";
 import "@puckeditor/core/dist/index.css";
 import { puckConfig } from "../cms/themes/labmu-pro/puck/config";
 
+const defaultHomePuck = {
+  content: [
+    { type: "SiteHeader", props: { id: "SiteHeader-1" } },
+    { type: "Hero", props: { id: "Hero-1" } },
+    { type: "Partners", props: { id: "Partners-1" } },
+    { type: "FeatureGrid", props: { id: "FeatureGrid-1" } },
+    { type: "Testimonial", props: { id: "Testimonial-1" } },
+    { type: "RecentPosts", props: { id: "RecentPosts-1" } },
+    { type: "CallToAction", props: { id: "CallToAction-1" } },
+    { type: "SiteFooter", props: { id: "SiteFooter-1" } }
+  ],
+  root: {},
+  zones: {}
+};
+
 interface ThemeEditorAppProps {
   slug: string;
 }
 
 export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
   const [initialData, setInitialData] = useState<any>(null);
+  const [currentData, setCurrentData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [pages, setPages] = useState<{id: number, title: string, slug: string}[]>([]);
-
-  // Default empty data
-  const defaultData = {
-    content: [],
-    root: {},
-    zones: {},
-  };
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('labmu_token') || '' : '';
@@ -52,19 +61,44 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
             try {
               const parsed = JSON.parse(result.data.body);
               setInitialData(parsed);
+              setCurrentData(parsed);
             } catch (e) {
               console.error("Gagal parse body JSON", e);
-              setInitialData(defaultData);
+              if (slug === 'home') {
+                 setInitialData(defaultHomePuck);
+                 setCurrentData(defaultHomePuck);
+              } else {
+                 setInitialData({ content: [], root: {}, zones: {} });
+                 setCurrentData({ content: [], root: {}, zones: {} });
+              }
             }
           } else {
-            setInitialData(defaultData);
+             if (slug === 'home') {
+                 setInitialData(defaultHomePuck);
+                 setCurrentData(defaultHomePuck);
+              } else {
+                 setInitialData({ content: [], root: {}, zones: {} });
+                 setCurrentData({ content: [], root: {}, zones: {} });
+              }
           }
         } else {
-          setInitialData(defaultData);
+           if (slug === 'home') {
+               setInitialData(defaultHomePuck);
+               setCurrentData(defaultHomePuck);
+            } else {
+               setInitialData({ content: [], root: {}, zones: {} });
+               setCurrentData({ content: [], root: {}, zones: {} });
+            }
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        setInitialData(defaultData);
+        if (slug === 'home') {
+           setInitialData(defaultHomePuck);
+           setCurrentData(defaultHomePuck);
+        } else {
+           setInitialData({ content: [], root: {}, zones: {} });
+           setCurrentData({ content: [], root: {}, zones: {} });
+        }
       } finally {
         setIsLoading(false);
       }
@@ -119,7 +153,7 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !initialData) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
         <div className="text-xl font-semibold text-gray-500">Memuat Editor...</div>
@@ -139,70 +173,62 @@ export default function ThemeEditorApp({ slug }: ThemeEditorAppProps) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      {/* Custom Top Bar */}
-      <div style={{
-        height: '50px',
-        background: '#1f2937',
-        color: 'white',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 20px',
-        justifyContent: 'space-between',
-        borderBottom: '1px solid #374151'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <a href="/admin" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14px' }}>&larr; Kembali ke Admin</a>
-          <span style={{ fontWeight: 'bold', fontSize: '16px' }}>Theme Editor</span>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <label htmlFor="pageSelect" style={{ fontSize: '14px', color: '#d1d5db' }}>Edit Halaman:</label>
-          <select 
-            id="pageSelect"
-            value={slug}
-            onChange={handlePageChange}
-            style={{
-              padding: '6px 12px',
-              borderRadius: '4px',
-              background: '#374151',
-              color: 'white',
-              border: '1px solid #4b5563',
-              fontSize: '14px',
-              cursor: 'pointer'
-            }}
-          >
-            {displayPages.map(p => (
-              <option key={p.slug} value={p.slug}>{p.title} (/{p.slug})</option>
-            ))}
-          </select>
-          
-          <button 
-            onClick={handleCreateNewPage}
-            style={{
-              background: '#2563eb',
-              color: 'white',
-              border: 'none',
-              padding: '6px 12px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
-          >
-            + Buat Baru
-          </button>
-        </div>
-      </div>
-
-      {/* Puck Editor Container */}
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        <Puck
-          config={puckConfig}
-          data={initialData}
-          onPublish={handlePublish}
-        />
-      </div>
+    <div style={{ height: '100vh', width: '100vw' }}>
+      <Puck
+        config={puckConfig}
+        data={initialData}
+        onChange={(data) => setCurrentData(data)}
+        onPublish={handlePublish}
+        iframe={{ enabled: true, syncHostStyles: true }}
+        overrides={{
+          headerActions: ({ children }) => (
+            <>
+              <a href="/admin" style={{ marginRight: 'auto', color: '#6b7280', textDecoration: 'none', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
+                &larr; Kembali ke Admin
+              </a>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto', marginRight: '16px' }}>
+                <select 
+                  value={slug}
+                  onChange={handlePageChange}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    background: '#f3f4f6',
+                    color: '#374151',
+                    border: '1px solid #d1d5db',
+                    fontSize: '13px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {displayPages.map(p => (
+                    <option key={p.slug} value={p.slug}>
+                      {p.title} (/{p.slug})
+                    </option>
+                  ))}
+                </select>
+                <button 
+                  onClick={handleCreateNewPage}
+                  style={{
+                    background: '#2563eb',
+                    color: 'white',
+                    border: 'none',
+                    padding: '4px 12px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: '500'
+                  }}
+                >
+                  + Baru
+                </button>
+              </div>
+              
+              {children}
+            </>
+          )
+        }}
+      />
     </div>
   );
 }

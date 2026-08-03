@@ -11,6 +11,7 @@ export const settingsPage = `
             admin_email: '', 
             site_logo: '',
             site_favicon: '',
+            site_homepage_slug: 'home',
             theme_primary: '#2271b1',
             theme_primary_dark: '#135e96',
             theme_bg: '#ffffff',
@@ -22,6 +23,7 @@ export const settingsPage = `
         mediaModalOpen: false,
         mediaTab: 'library',
         mediaList: [],
+        pagesList: [],
         uploadFile: null,
         uploadPreview: null,
         selectedMedia: null,
@@ -48,6 +50,15 @@ export const settingsPage = `
                     // Handle format { data: {...} } atau langsung {...}
                     const data = json.data || json;
                     this.settings = { ...this.settings, ...data };
+                }
+                
+                // Fetch pages for homepage dropdown
+                const pagesRes = await fetch('/api/pages', { 
+                    headers: { 'Authorization': 'Bearer ' + token } 
+                });
+                if (pagesRes.ok) {
+                    const pagesJson = await pagesRes.json();
+                    this.pagesList = pagesJson.data || pagesJson || [];
                 }
             } catch(e) { console.error('Gagal load settings', e); }
             finally { this.isLoading = false; }
@@ -183,6 +194,17 @@ export const settingsPage = `
             <div style="margin-bottom:15px;">
                 <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px; color:#4b5563;">Admin Email</label>
                 <input type="email" x-model="settings.admin_email" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; box-sizing:border-box;">
+            </div>
+
+            <div style="margin-bottom:15px; border-top: 1px solid #e5e7eb; padding-top: 15px;">
+                <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px; color:#4b5563;">Halaman Utama (Homepage)</label>
+                <p style="font-size:12px; color:#6b7280; margin-bottom:10px;">Pilih halaman yang akan ditampilkan sebagai Beranda situs Anda.</p>
+                <select x-model="settings.site_homepage_slug" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; box-sizing:border-box; background:white;">
+                    <option value="home">Default (Sistem / home)</option>
+                    <template x-for="p in pagesList" :key="p.id">
+                        <option :value="p.slug" x-text="p.title + ' (/' + p.slug + ')'"></option>
+                    </template>
+                </select>
             </div>
         </div>
 

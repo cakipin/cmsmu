@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { renderAdmin } from './ui/view';      // Import Dashboard dari views.ts
 import { editorPage } from './ui/blocks/editor.page';
+import { ssoCallbackPage } from './ui/pages/sso-callback.page';
 
 // Definisikan tipe Bindings agar TypeScript tidak error saat akses c.env.DB
 interface Bindings {
@@ -12,6 +13,11 @@ const admin = new Hono<{ Bindings: Bindings }>();
 // 1. DASHBOARD UTAMA
 admin.get('/', (c) => {
   return c.html(renderAdmin());
+});
+
+// 1b. SSO CALLBACK
+admin.get('/sso/callback', (c) => {
+  return c.html(ssoCallbackPage);
 });
 
 // 2. EDITOR ROUTES (Menangani Post & Page)
