@@ -242,16 +242,37 @@ export const puckConfig: Config<Props> = {
       },
       render: ({ slides, sliderHeight, textPosition, overlayOpacity, titleColor, titleSize }) => {
         const uid = `muslider_${Math.random().toString(36).slice(2, 7)}`;
+
+        // Migration map: translate old Tailwind DB values → valid CSS values
+        const heightMap: Record<string, string> = {
+          'h-[600px]': '600px', 'h-[800px]': '800px', 'h-screen': '100vh',
+          '600px': '600px', '80vh': '80vh', '100vh': '100vh'
+        };
+        const height = heightMap[sliderHeight] || sliderHeight || '600px';
+
+        const posMap: Record<string, string> = {
+          'items-start text-left': 'left', 'items-center text-center': 'center', 'items-end text-right': 'right',
+          'left': 'left', 'center': 'center', 'right': 'right'
+        };
+        const pos = posMap[textPosition] || 'center';
+
+        const fontMap: Record<string, string> = {
+          'text-4xl md:text-6xl': '3.5rem', 'text-5xl md:text-7xl': '4.5rem',
+          '3.5rem': '3.5rem', '4.5rem': '4.5rem'
+        };
+        const fontSize = fontMap[titleSize] || titleSize || '3.5rem';
+
         const overlayColor = `rgba(15,23,42,${(overlayOpacity ?? 50) / 100})`;
-        const textAlign = textPosition ?? 'center';
-        const alignItems = textPosition === 'left' ? 'flex-start' : textPosition === 'right' ? 'flex-end' : 'center';
+        const textAlign = pos;
+        const alignItems = pos === 'left' ? 'flex-start' : pos === 'right' ? 'flex-end' : 'center';
+
 
         const slidesHtml = (slides || []).map((slide: any, idx: number) => `
           <div class="${uid}-slide${idx === 0 ? ' active' : ''}">
             ${slide.image ? `<img src="${slide.image}" alt="${slide.title || ''}" class="${uid}-bg" />` : `<div class="${uid}-bg" style="background:#1e293b"></div>`}
             <div class="${uid}-overlay"></div>
             <div class="${uid}-content" style="align-items:${alignItems};text-align:${textAlign};">
-              <h2 class="${uid}-title" style="color:${titleColor ?? '#fff'};font-size:${titleSize ?? '3.5rem'}">${slide.title || ''}</h2>
+              <h2 class="${uid}-title" style="color:${titleColor ?? '#fff'};font-size:${fontSize}">${slide.title || ''}</h2>
               <p class="${uid}-desc">${slide.subtitle || ''}</p>
               ${slide.buttonText ? `<a href="${slide.buttonLink || '#'}" class="${uid}-btn">${slide.buttonText}</a>` : ''}
             </div>
@@ -272,7 +293,7 @@ export const puckConfig: Config<Props> = {
 
         const html = `
 <style>
-  .${uid}-wrap{position:relative;width:100%;height:${sliderHeight ?? '600px'};overflow:hidden;background:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;}
+  .${uid}-wrap{position:relative;width:100%;height:${height};overflow:hidden;background:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;}
   .${uid}-slide{position:absolute;inset:0;opacity:0;transition:opacity 0.8s ease-in-out;z-index:0;}
   .${uid}-slide.active{opacity:1;z-index:10;}
   .${uid}-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:1;}
